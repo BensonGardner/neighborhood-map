@@ -1,5 +1,7 @@
 var viewModel = {
     
+    placesArray: ko.observableArray(data.placeData),
+    
     filterInput: ko.observable(''),
  
     mapStyles: [
@@ -165,7 +167,9 @@ var viewModel = {
         
         viewModel.map = new google.maps.Map(document.getElementById('map'), {
             center: data.mapStart, 
-            zoom: 14,
+            zoom: 13,
+            styles: this.mapStyles,
+            mapTypeControl: false
         });
       
         // Create markers appearing on initialize
@@ -203,4 +207,9 @@ var viewModel = {
 
 };
 
-ko.applyBindings(viewModel);
+Promise.all([data, knockout]).then(function() {
+    ko.applyBindings(viewModel);
+}, function() {
+    document.getElementById('list').append('Failed to load required files. Please try refreshing the page.');
+});
+

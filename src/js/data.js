@@ -20,10 +20,14 @@ var data = {
     mapStart: {lat: 34.0488884, lng: -118.2404842},
     
     placeData: [
-        {title: '', 
-         position: {lat: 0, lng: 0}
+        {
+            title: 'Japanese Village Plaza', 
+            position: {lat: 34.0488884, lng: -118.2404842}
         },
-        {}
+        {
+            title: 'Mitsuru Cafe',
+            position: {lat: 34.0489316, lng: -118.2416973}
+        }
     ],
     
     filter: '',
