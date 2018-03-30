@@ -42,7 +42,7 @@ var data = {
 var viewModel = {
     
     placesArray: ko.observableArray(data.placeData),
-    
+        
     filterInput: ko.observable(''),
  
     mapStyles: [
@@ -257,6 +257,10 @@ var viewModel = {
     }
 
 };
+
+    console.log(viewModel.placesArray);
+
+ko.applyBindings(viewModel);
 
 /*
 Promise.all([data, knockout]).then(function() {
