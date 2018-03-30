@@ -112,7 +112,7 @@ var viewModel = {
                 }
             ]
         },
-        {
+       /* {
             "featureType": "road",
             "elementType": "labels",
             "stylers": [
@@ -120,19 +120,31 @@ var viewModel = {
                     "visibility": "off"
                 }
             ]
-        },
-       /*a possible addition {
-            "featureType": "road.highway",
+        },*/
+        {
+            "featureType": "road",
             "elementType": "labels.text",
             "stylers": [
                 {
-                    "visibility": "simplified"
+                    "visibility": "on"
                 },
                 {
-                    "color": "#656565"
-                }
+                    "color": "#f4f4f4"
+                },
             ]
-        },*/
+        },
+        {
+            "featureType": "road",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "visibility": "off"
+                },
+                {
+                    "color": "#222222"
+                },
+            ]
+        },
         {
             "featureType": "transit",
             "elementType": "labels.icon",
