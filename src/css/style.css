@@ -1,2 +1,24 @@
 /* Contains all styles other than those of the map, which are contained in viewModel.js. */
 
+html {
+    height: 100%;
+}
+body {
+    font-family: Roboto, sans-serif;
+    height: 100%;
+    width: 100%;
+}
+
+select-zone {
+    background-color: darkgreen;
+}
+
+header {
+    background: white;
+    color: #494949;
+}
+
+#map {
+    height: 100%;
+    width: 87vw;
+}

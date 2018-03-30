@@ -17,17 +17,16 @@
 
 
 var data = {
-    startCenter: {lat: 0, lng: 0},
+    mapStart: {lat: 34.0488884, lng: -118.2404842},
     
-    markerData: [
+    placeData: [
         {title: '', 
-         position: {
-            lat: 0, 
-            lng: 0
-         }
+         position: {lat: 0, lng: 0}
         },
         {}
     ],
+    
+    filter: '',
     
     
 

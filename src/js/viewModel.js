@@ -1,6 +1,8 @@
 var viewModel = {
+    
+    filterInput: ko.observable(''),
  
-    styles: [
+    mapStyles: [
         {
             "featureType": "administrative",
             "elementType": "labels",
@@ -159,17 +161,20 @@ var viewModel = {
 
     initMap: function() {
 
-        this.map = new google.maps.Map(document.getElementById('map'), {
+        console.log(this.map);
+        
+        viewModel.map = new google.maps.Map(document.getElementById('map'), {
             center: data.mapStart, 
-            zoom: 14
+            zoom: 14,
         });
       
         // Create markers appearing on initialize
-        for (i = 0; i < markerData.length; i++) {
+        for (i = 0; i < placeData.length; i++) {
             var marker = new google.maps.Marker({
-                position: data.markerData[i].position,
-                map: map,
-                title: data.markerData[i].title
+                position: data.placeData[i].position,
+                map: this.map,
+                styles: viewModel.mapStyles,
+                title: data.placeData[i].title
             });
         markers.push(marker);
         };
@@ -186,6 +191,16 @@ var viewModel = {
              infoWindow.open(map, marker);
          });*/
 
-     }
+     },
+    
+    updatePlaces: function() {
+        // loop through both the markers 
+        // and the list and display only 
+        // the one(s) matching the filter
+        // which should be recorded in data/
+        
+    }
 
-}
+};
+
+ko.applyBindings(viewModel);

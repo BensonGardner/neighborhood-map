@@ -1,19 +1,66 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-      <meta charset="utf-8">
-      <title>Little Tokyo, L.A.</title>
+        <meta charset="utf-8">
+        <title>Little Tokyo is Fun</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
     <body>
         <header>
         <h1>Little Tokyo, L.A. is Fun</h1>
         </header>
-            <!-- The filter div and list use Knockout's data-bindings to track updates to filtering and clicking -->
-            <div id="filter-controls"></div>
-            <ul id="list" data-bind=""></ul>
-                    <div id="map"></div>
+        
+        <!-- The filter div and list use Knockout's data-bindings to automatically update and filter the place list -->
+        <div id="select-zone">
+            <input data-bind="textInput: viewModel.filterInput" id="filter-input">
+            <ul id="list" data-bind="forEach: placesData">
+                <li>
+                    </li>
+            </ul>
+        </div>
+        <div id="map"></div>
+        
+        <script>
+            var map;
+
+            function initMap() {
+
+                console.log(data.mapStart);
+
+                map = new google.maps.Map(document.getElementById('map'), {
+                  center: data.mapStart, 
+                    zoom: 14,
+                });
+
+                // Create markers appearing on initialize
+                /*for (i = 0; i < placeData.length; i++) {
+                    var marker = new google.maps.Marker({
+                        position: data.placeData[i].position,
+                        map: this.map,
+                        styles: viewModel.mapStyles,
+                        title: data.placeData[i].title
+                    });
+                markers.push(marker);
+                };*/
+
+                // Add an infoWindow to each marker either inside the above loop or in a separate loop.
+
+                // Create a single infowindow that appears on clicking marker
+                /* var infoWindow = new google.maps.InfoWindow({
+                     content: 'This is the perfect place for spying on Solar NY'
+                 });
+
+                 // Event listener for clicking on marker
+                 marker.addListener('click', function() {
+                     infoWindow.open(map, marker);
+                 });*/
+
+                };
+        </script>
+        <script src="js/libraries/knockout-3.4.2.js" async></script>
+        <script src="js/data.js" async defer></script>
+        <script src="js/viewModel.js" async defer></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCaf9Ff3b7aKVQV5_4ej_QSxFKKttpFNw&v=3&callback=initMap"></script>
+
     </body>
-    <script src="js/libraries/knockout-3.4.2.js" async defer></script>
-    <script src="js/data.js" async defer></script>
-    <script src="js/viewModel.js" async defer></script>
 </html>
