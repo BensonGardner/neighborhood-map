@@ -30,6 +30,11 @@ var data = {
             title: 'Mitsuru Cafe',
             position: {lat: 34.0489316, lng: -118.2416973},
             feature: 'Delicious sweet/salty dango'
+        },
+        {
+            title: 'test',
+            position: {lat: 34.5, lng: -118.5},
+            feature: ''
         }
     ],
     
@@ -37,69 +42,6 @@ var data = {
 
 
 var viewModel = function() {
-    
-    // The filter property keeps track 
-    // of the content of the input field.
-    // Although we'll use nothing but knockout 
-    // bindings to update the list, we'll 
-    // store the value in this variable for 
-    // filtering the map markers.
-    this.filter = ko.observable('');
-    
-    this.placesArray = ko.observableArray(data.placeData);
-    
-    // Subscribe to the filter. Wheneger it 
-    // changes, do two things: update the markers
-    // and update the placesArray
-    this.filter.subscribe(function(newValue) {
-        // renew both the placesArray and 
-        // markers to their initial state 
-        // (i.e., including all places from 
-        // placeData)
-        this.placesArray = ko.observableArray(data.placeData);
-        markers.length = 0;
-        this.createMarkers();
-        
-        // Next, remove all places that don't have
-        // newValue in their title or feature property
-        // Would it be better to put both these loops together
-        // using placeData.length to control loop?
-        
-        for (i = 0; i < placeData.length; i++) {
-            var currentPlaceItem = placesArray[i],
-                currentMarker = markers[i],
-                currentPlace = placeData[i];
-            if ((currentPlace.title + currentPlace.feature).indexOf(filter) === -1) {
-                placesArray.remove(currentPlaceItem);
-            };
-            // DO SOMETHING TO HIDE SELECTED MARKER
-        };
-    });
-        
-   /* not using this method this.filterTrue = ko.computed(function() {
-        //var self = this;
-        if ((this.title +   this.feature).indexOf(self.filter) != -1) {
-            return 'block'
-        } else {
-            return 'none'
-        };
-    }); */
-    
-    // WON'T NEED THIS NOW - 
-    // DELETE AFTER I MAKE SURE I'M RIGHT
-    // Doing this with bindings now
-    // filter: function() {}, // I'm not sure if this is 
-    // atually a function, or if there's
-    // some other way to handle it using 
-    // the text-input binding. 
-    // The idea, is typing in the search box
-    // will trigger (Thru ko) a function
-    // that seearches for that value in the 
-    // values (titels and the "notable draws" fields)
-    // and if the match is false, removes those
-    // items from the array - while at the same time
-    // calling the googleMap API to hide the equivalent
-    // markers. 
     
     this.mapStyles = [
         {
@@ -270,6 +212,7 @@ var viewModel = function() {
     
     this.markers = [];
 
+    /* think not doing this 
     this.updateMarkers = function() {
         for (i = 0; i < this.markers; i++) {
             markers.forEach(function() {
@@ -279,8 +222,8 @@ var viewModel = function() {
                 };
             })
         }
-    };
-    
+    }; */
+     
     this.selectPlace = function() {
         console.log('selected! ' + this.title);
         
@@ -304,6 +247,83 @@ var viewModel = function() {
             this.markers.push(marker);
         };
     };
+    
+    // The filter property keeps track 
+    // of the content of the input field.
+    // Although we'll use nothing but knockout 
+    // bindings to update the list, we'll 
+    // store the value in this variable for 
+    // filtering the map markers.
+    this.filter = ko.observable('');
+    
+    this.placesArray = data.placeData;
+    
+    this.listArray = ko.observableArray(placesArray);
+    
+    // Subscribe to the filter. Wheneger it 
+    // changes, do two things: update the markers
+    // and update the listArray
+    this.filter.subscribe(function(newValue) {
+        // renew both the listArray and 
+        // markers to their initial state 
+        // (i.e., including all places from 
+        // placeData)
+        console.log(listArray().length + '. ' + placesArray.length + '. ' + data.placeData.length);
+        listArray(data.placeData);
+        
+        markers.length = 0;
+        createMarkers();
+        console.log(filter());
+        
+        // Next, remove all places that don't have
+        // newValue in their title or feature property
+        // Need to figure out case issue.
+        // Right now, doesn't always filter correctly
+        // might be due to length of array changing mid-
+        // process??
+        
+        for (i = 0; i < data.placeData.length; i++) {
+            var currentPlaceItem = listArray()[i],
+                currentMarker = markers[i],
+                currentPlace = data.placeData[i];
+            console.log(currentPlaceItem);
+            console.log(currentMarker);
+            console.log(currentPlace);
+            console.log((currentPlace.title + currentPlace.feature).indexOf(filter()));
+            if ((currentPlace.title + currentPlace.feature).indexOf(filter()) == -1) {
+                console.log((currentPlace.title + currentPlace.feature).indexOf(filter()));
+                console.log("removing " + currentPlaceItem.title);
+                listArray.remove(currentPlaceItem);
+                console.log(data.placeData);
+            };
+            // DO SOMETHING TO HIDE SELECTED MARKER
+        };
+    });
+        
+   /* not using this method this.filterTrue = ko.computed(function() {
+        //var self = this;
+        if ((this.title +   this.feature).indexOf(self.filter) != -1) {
+            return 'block'
+        } else {
+            return 'none'
+        };
+    }); */
+    
+    // WON'T NEED THIS NOW - 
+    // DELETE AFTER I MAKE SURE I'M RIGHT
+    // Doing this with bindings now
+    // filter: function() {}, // I'm not sure if this is 
+    // atually a function, or if there's
+    // some other way to handle it using 
+    // the text-input binding. 
+    // The idea, is typing in the search box
+    // will trigger (Thru ko) a function
+    // that seearches for that value in the 
+    // values (titels and the "notable draws" fields)
+    // and if the match is false, removes those
+    // items from the array - while at the same time
+    // calling the googleMap API to hide the equivalent
+    // markers. 
         
     this.initMap = function() {
         

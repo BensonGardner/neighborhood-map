@@ -18,7 +18,7 @@
                     <input data-bind="textInput: filter" id="filter-input">
                     <!--This works. <p data-bind="text: filter"></p>-->
                     <!-- next step is using .remove() on the placesArray with an argument like 'all those items whose title or interestingn feature fields .include(filter)-->
-                    <ul id="list" data-bind="foreach: placesArray">
+                    <ul id="list" data-bind="foreach: listArray">
                         <li data-bind="attr: {id: title}, click: selectPlace"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
                     </ul>
                 </div>
