@@ -269,7 +269,9 @@ var viewModel = function() {
         // (i.e., including all places from 
         // placeData)
         console.log(listArray().length + '. ' + placesArray.length + '. ' + data.placeData.length);
-        listArray(data.placeData);
+        placesArray = data.placeData;
+        listArray(placesArray);
+        console.log(listArray().length + '. ' + placesArray.length + '. ' + data.placeData.length);
         
         markers.length = 0;
         createMarkers();
@@ -286,9 +288,6 @@ var viewModel = function() {
             var currentPlaceItem = listArray()[i],
                 currentMarker = markers[i],
                 currentPlace = data.placeData[i];
-            console.log(currentPlaceItem);
-            console.log(currentMarker);
-            console.log(currentPlace);
             console.log((currentPlace.title + currentPlace.feature).indexOf(filter()));
             if ((currentPlace.title + currentPlace.feature).indexOf(filter()) == -1) {
                 console.log((currentPlace.title + currentPlace.feature).indexOf(filter()));
