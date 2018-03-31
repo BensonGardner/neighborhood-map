@@ -5,25 +5,31 @@ html {
 }
 
 body {
-    background-color: #1A6706;
+    background-color: #123201;
     font-family: Roboto, sans-serif;
+    color: #F9F9F9;
     height: 100%;
     width: 100%;
-    margin: 0 0 0 10px;
     padding: 0;
+    margin: 0;
 }
 
 header {
     /*background: white;*/
-    color: #FFF;
     height: 10wv;
+    margin: 0 0 0 10px;
+}
+
+h1 {
+    font-size: 39px;
+    font-weight: 700;
 }
 
 #container {
     width: 100vw;
     height: 100%;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap-reverse;
 }
 
 #text-elements {
@@ -33,13 +39,39 @@ header {
 #filter-input {
     width: 100%;
     margin: 0px;
+    border-style: none;
 }
 
 ul {
     list-style-type: none;
-    height: 25px;
-    border: 1px 0;
-    border-color: black;
+    margin: 30px 0;
+    padding: 0;
+}
+
+li {
+    /*height: 40px; */
+    padding: 12px;
+    /* margin: 30px 0; */
+    border-top-style: solid;
+    border-width: 2px;
+    border-color: #888;
+}
+
+li .selected {
+    background-color: #92B281;
+}
+
+li:last-of-type {
+    border-bottom-style: solid;
+}
+
+.title {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.feature {
+    font-size: 11px;
 }
 
 /* select-zone {

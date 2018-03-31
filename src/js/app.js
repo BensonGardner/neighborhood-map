@@ -14,7 +14,7 @@
 //THE RELATIONSHIP OF ABOVE LINE AND BELOW LINE IS INTERESTING....
 // the current value of the input (search filter) field (i.e., what markers/list items would be currently displayed)
 
-// 
+// consider including with each place a single line about what makes it remarkable, like "Dango" "Anime Idol Competition" -- this could tie in the photos nicely. 
 
 
 var data = {
@@ -23,29 +23,61 @@ var data = {
     placeData: [
         {
             title: 'Japanese Village Plaza', 
-            position: {lat: 34.0488884, lng: -118.2404842}
+            position: {lat: 34.0488884, lng: -118.2404842},
+            feature: 'Anime Idol Competition'
         },
         {
             title: 'Mitsuru Cafe',
-            position: {lat: 34.0489316, lng: -118.2416973}
+            position: {lat: 34.0489316, lng: -118.2416973},
+            feature: 'Delicious sweet/salty dango'
         }
     ],
-    
-    filter: '',
-    
-    
-
     
 };
 
 
-var viewModel = {
+var viewModel = function() {
     
-    placesArray: ko.observableArray(data.placeData),
-        
-    filterInput: ko.observable(''),
- 
-    mapStyles: [
+    // The filter property keeps track 
+    // of the content of the input field.
+    // Although we'll use nothing but knockout 
+    // bindings to update the list, we'll 
+    // store the value in this variable for 
+    // filtering the map markers.
+    this.filter = ko.observable('');
+    
+    this.placesArray = ko.observableArray(data.placeData);
+    
+    /*this.placesArray.foreach(function() {
+        this.filterTrue = ko.computed(function() {
+            var self = this;
+            if (this.title
+                //(this.title + this.feature).indexOf(self.filter)
+            ) {
+                return 'auto'
+            } else {
+                return 'none'
+            };
+        });
+    });
+    */
+    // WON'T NEED THIS NOW - 
+    // DELETE AFTER I MAKE SURE I'M RIGHT
+    // Doing this with bindings now
+    // filter: function() {}, // I'm not sure if this is 
+    // atually a function, or if there's
+    // some other way to handle it using 
+    // the text-input binding. 
+    // The idea, is typing in the search box
+    // will trigger (Thru ko) a function
+    // that seearches for that value in the 
+    // values (titels and the "notable draws" fields)
+    // and if the match is false, removes those
+    // items from the array - while at the same time
+    // calling the googleMap API to hide the equivalent
+    // markers. 
+    
+    this.mapStyles = [
         {
             "featureType": "administrative",
             "elementType": "labels",
@@ -210,11 +242,33 @@ var viewModel = {
         }
     ],
     
-    map: null,
+    this.map = null,
     
-    markers: [],
+    this.markers = [],
 
-    initMap: function() {
+    this.updateMarkers = function() {
+        for (i = 0; i < this.markers; i++) {
+            markers.forEach(function() {
+                this.visibility = "off";
+                if (this.filter) {
+                    this.visibility = "on";
+                };
+            })
+        }
+    },
+    
+    this.selectPlace = function() {
+        console.log('selected! ' + this.title);
+        
+        // Needs to be called by either a
+        // list item or a marker
+        // Needs to select that marker and 
+        // that list item (through a similar id?)
+        // , toggle the selected class on the li,
+        //  toggle the infoWindow visibility on the marker, and activate the  marker animation.
+    },
+    
+    this.initMap = function() {
         
         this.map = new google.maps.Map(document.getElementById('map'), {
             center: data.mapStart, 
@@ -229,9 +283,10 @@ var viewModel = {
                 position: data.placeData[i].position,
                 map: this.map,
                 styles: viewModel.mapStyles,
-                title: data.placeData[i].title
+                title: data.placeData[i].title,
+                filter: data.placeData[i].filter
             });
-        this.markers.push(marker);
+            this.markers.push(marker);
         };
         
         // Add an infoWindow to each marker either inside the above loop or in a separate loop.
@@ -248,7 +303,7 @@ var viewModel = {
 
      },
     
-    updatePlaces: function() {
+    this.updatePlaces = function() {
         // loop through both the markers 
         // and the list and display only 
         // the one(s) matching the filter
@@ -258,9 +313,9 @@ var viewModel = {
 
 };
 
-    console.log(viewModel.placesArray);
+console.log(viewModel);
 
-ko.applyBindings(viewModel);
+ko.applyBindings(viewModel());
 
 /*
 Promise.all([data, knockout]).then(function() {

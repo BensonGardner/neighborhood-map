@@ -9,15 +9,17 @@
         <div id="container">
             <div id="text-elements">
                 <header>
-                <h1>Interesting Places in L.A.'s Little Tokyo</h1>
+                <h1>Explore Places in L.A.'s Little Tokyo</h1>
                 </header>
 
                 <!-- The filter div and list use Knockout's data-bindings to automatically update and filter the place list -->
 
                 <div id="select-zone">
-                    <input data-bind="textInput: viewModel.filterInput" id="filter-input">
-                    <ul id="list" data-bind="forEach: viewModel.placesArray">
-                        <li data-bind="text: title, attr: {id: title}, click: $parent.SOMEFUNCTIONTOSELECTPLACE"></li>
+                    <input data-bind="textInput: filter" id="filter-input">
+                    <!--This works. <p data-bind="text: filter"></p>-->
+                    <!-- next step is using .remove() on the placesArray with an argument like 'all those items whose title or interestingn feature fields .include(filter)-->
+                    <ul id="list" data-bind="foreach: placesArray">
+                        <li data-bind="attr: {id: title}, click: selectPlace"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
                     </ul>
                 </div>
             </div>
@@ -28,7 +30,7 @@
         <!--<script src="js/data.js" async></script>-->
         <script src="js/libraries/knockout-3.4.2.js" async></script>
         <script src="js/app.js" async defer></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCaf9Ff3b7aKVQV5_4ej_QSxFKKttpFNw&v=3&callback=viewModel.initMap"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCaf9Ff3b7aKVQV5_4ej_QSxFKKttpFNw&v=3&callback=initMap"></script>
 
     </body>
 </html>
