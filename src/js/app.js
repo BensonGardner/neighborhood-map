@@ -48,19 +48,43 @@ var viewModel = function() {
     
     this.placesArray = ko.observableArray(data.placeData);
     
-    /*this.placesArray.foreach(function() {
-        this.filterTrue = ko.computed(function() {
-            var self = this;
-            if (this.title
-                //(this.title + this.feature).indexOf(self.filter)
-            ) {
-                return 'auto'
-            } else {
-                return 'none'
+    // Subscribe to the filter. Wheneger it 
+    // changes, do two things: update the markers
+    // and update the placesArray
+    this.filter.subscribe(function(newValue) {
+        // renew both the placesArray and 
+        // markers to their initial state 
+        // (i.e., including all places from 
+        // placeData)
+        this.placesArray = ko.observableArray(data.placeData);
+        markers.length = 0;
+        this.createMarkers();
+        
+        // Next, remove all places that don't have
+        // newValue in their title or feature property
+        // Would it be better to put both these loops together
+        // using placeData.length to control loop?
+        
+        for (i = 0; i < placeData.length; i++) {
+            var currentPlaceItem = placesArray[i],
+                currentMarker = markers[i],
+                currentPlace = placeData[i];
+            if ((currentPlace.title + currentPlace.feature).indexOf(filter) === -1) {
+                placesArray.remove(currentPlaceItem);
             };
-        });
+            // DO SOMETHING TO HIDE SELECTED MARKER
+        };
     });
-    */
+        
+   /* not using this method this.filterTrue = ko.computed(function() {
+        //var self = this;
+        if ((this.title +   this.feature).indexOf(self.filter) != -1) {
+            return 'block'
+        } else {
+            return 'none'
+        };
+    }); */
+    
     // WON'T NEED THIS NOW - 
     // DELETE AFTER I MAKE SURE I'M RIGHT
     // Doing this with bindings now
@@ -240,11 +264,11 @@ var viewModel = function() {
                 }
             ]
         }
-    ],
+    ];
     
-    this.map = null,
+    this.map = null;
     
-    this.markers = [],
+    this.markers = [];
 
     this.updateMarkers = function() {
         for (i = 0; i < this.markers; i++) {
@@ -255,7 +279,7 @@ var viewModel = function() {
                 };
             })
         }
-    },
+    };
     
     this.selectPlace = function() {
         console.log('selected! ' + this.title);
@@ -266,18 +290,9 @@ var viewModel = function() {
         // that list item (through a similar id?)
         // , toggle the selected class on the li,
         //  toggle the infoWindow visibility on the marker, and activate the  marker animation.
-    },
+    };
     
-    this.initMap = function() {
-        
-        this.map = new google.maps.Map(document.getElementById('map'), {
-            center: data.mapStart, 
-            zoom: 13,
-            styles: this.mapStyles,
-            mapTypeControl: false
-        });
-      
-        // Create markers appearing on initialize
+    this.createMarkers = function() {
         for (i = 0; i < data.placeData.length; i++) {
             var marker = new google.maps.Marker({
                 position: data.placeData[i].position,
@@ -288,6 +303,20 @@ var viewModel = function() {
             });
             this.markers.push(marker);
         };
+    };
+        
+    this.initMap = function() {
+        
+        this.map = new google.maps.Map(document.getElementById('map'), {
+            center: data.mapStart, 
+            zoom: 13,
+            styles: this.mapStyles,
+            mapTypeControl: false
+        });
+      
+        // Create markers appearing on initialize
+        
+        this.createMarkers();
         
         // Add an infoWindow to each marker either inside the above loop or in a separate loop.
         
@@ -301,7 +330,7 @@ var viewModel = function() {
              infoWindow.open(map, marker);
          });*/
 
-     },
+     };
     
     this.updatePlaces = function() {
         // loop through both the markers 
@@ -309,7 +338,7 @@ var viewModel = function() {
         // the one(s) matching the filter
         // which should be recorded in data/
         
-    }
+    };
 
 };
 
