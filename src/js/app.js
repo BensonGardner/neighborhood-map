@@ -1,22 +1,5 @@
 // This file was previously broken into data.js and viewModel.js, which could be donee again if we can solve the asynch issue with callbacks/promises.
 
-// markerData (location, title, possibly type of place [filterable], possibly the characteristic of whether or not there is a related photo, and any photo from a nearby spot pulled from the third-party apis)
-
-// I think the initial lat/lng, zoom, etc values required to load the map... .? Does that make sense? Or becuase it has to be loaded reight away, do we not want to bother having this in the data model? 
-
-// Map data??? Or does this all stay in google maps
-
-// any data required re: Flickr/etc? I don't think so.
-
-// if the input field is more than just a search of the titles, then there will be some data options assoc.
-
-// Which marker is highlighted(if any)
-//THE RELATIONSHIP OF ABOVE LINE AND BELOW LINE IS INTERESTING....
-// the current value of the input (search filter) field (i.e., what markers/list items would be currently displayed)
-
-// consider including with each place a single line about what makes it remarkable, like "Dango" "Anime Idol Competition" -- this could tie in the photos nicely. 
-
-
 var data = {
     mapStart: {lat: 34.0488884, lng: -118.2404842},
     
@@ -42,6 +25,8 @@ var data = {
 
 
 var viewModel = function() {
+    
+    var self = this;
     
     this.mapStyles = [
         {
@@ -212,7 +197,10 @@ var viewModel = function() {
     
     this.markers = [];
 
-    /* think not doing this 
+    /* I believe the below function will go away,
+       to be replaced by stuff in the subscribe
+       method farther below.
+       
     this.updateMarkers = function() {
         for (i = 0; i < this.markers; i++) {
             markers.forEach(function() {
@@ -223,17 +211,6 @@ var viewModel = function() {
             })
         }
     }; */
-     
-    this.selectPlace = function() {
-        console.log('selected! ' + this.title);
-        
-        // Needs to be called by either a
-        // list item or a marker
-        // Needs to select that marker and 
-        // that list item (through a similar id?)
-        // , toggle the selected class on the li,
-        //  toggle the infoWindow visibility on the marker, and activate the  marker animation.
-    };
     
     this.createMarkers = function() {
         for (i = 0; i < data.placeData.length; i++) {
@@ -248,34 +225,125 @@ var viewModel = function() {
         };
     };
     
+    this.selectPlace = function() {
+        console.log('selected! ' + this.title);
+        
+        // Needs to be called by either a
+        // list item or a marker
+        
+        // Select that marker and 
+        // that list item (through a similar id?),
+        // toggle the selected class on the li,
+        // toggle the infoWindow visibility on the marker, 
+        // and activate the  marker animation.
+    };
+    
     // The filter property keeps track 
-    // of the content of the input field.
-    // Although we'll use nothing but knockout 
-    // bindings to update the list, we'll 
-    // store the value in this variable for 
-    // filtering the map markers.
+    // of the content of the input field,
+    // through a data binding in index.html.
     this.filter = ko.observable('');
     
-    this.placesArray = data.placeData;
+    this.listArray = ko.observableArray(JSON.parse(JSON.stringify(data.placeData)));
+
+    /* COMMENTING THIS OUT FOR NOW --
+       I am trying to use the filteredList 
+       approach instead. When I tried this, 
+       I got the message that "display"
+       was not defined when I referenced it in the data
+       binding in index.html.
+       
+    // The computed function in this loop
+    // gets attached to the placeData array to 
+    // keep track of whether one of the list items' 
+    // title or feature properties contains the 
+    // text entered in the filter. 
+    for (i = 0; i < this.listArray.length; i++) {
+
+        var text = this.listArray[i].title + ' ' + 
+            this.listArray[i].feature;
+        
+        this.listArray[i].display = ko.computed(function() {
+            if (filter() == '') {
+                return 'block';
+            }
+            if (text.indexOf(filter()) == -1) {
+                return 'none';
+            } else {
+                return 'block';
+            };
+        });
+        
+        console.log('display() for ' + this.listArray[i].title + ' is ' + this.listArray[i].display());
     
-    this.listArray = ko.observableArray(placesArray);
+    };
+    
+    */
+    
+    // This line creates a copy of the placeData array 
+    // from our data model. We need to use the JSON methods
+    // in order to grab the exact same content but ensuring
+    // it's a copy, instead of the exact same object. 
+    // If it were the latter, our Knockout methods would
+    // alter our original data. 
+    
+    this.filteredList = ko.computed(function() {
+    
+        if (filter = '') {
+            return listArray;
+        } else {       
+            listArray().filter(function() {
+                this.listArray.remove(function (item) { 
+                    return ((item.title + item.feature).indexOf(this.filter) != -1); 
+                }) 
+            })
+        };  
+    });
+                                    
+    
+    // NOTE TO SELF: I think we need to try to computed() 
+    // idea after all. The filter thing isn't working
+    // because the length of the array (and thus the index number
+    // of each entry) changes the instant something is
+    // filtered out. Maybe we could also use the id instead
+    // of the array index?? 
+    
+    // What was the problem with teh computable again?
+    // maybe it was something else i hadn't figure out
+    // yet at that point.
     
     // Subscribe to the filter. Wheneger it 
     // changes, do two things: update the markers
     // and update the listArray
-    this.filter.subscribe(function(newValue) {
+
+   /* this.filter.subscribe(function(newValue) {
+        
+        var self = this;
+         
+        console.log(self.markers);
         // renew both the listArray and 
         // markers to their initial state 
         // (i.e., including all places from 
         // placeData)
-        console.log(listArray().length + '. ' + placesArray.length + '. ' + data.placeData.length);
-        placesArray = data.placeData;
-        listArray(placesArray);
-        console.log(listArray().length + '. ' + placesArray.length + '. ' + data.placeData.length);
+        console.log(listArray().length + '. ');
+        
+        //placesArray = JSON.parse(JSON.stringify(data.placeData));
+        //listArray(JSON.parse(JSON.stringify(data.placeData)));
+        
+        console.log(listArray().length + '. ' + data.placeData.length);
         
         markers.length = 0;
         createMarkers();
         console.log(filter());
+        
+        // The following code does not seem to 
+        // be the right solution. It is removing
+        // the wrong items, not enough items, etc.
+        // I'm guessing this is because the position
+        // of each item in the array is changing 
+        // the instant the first item is removed...
+        // therefore, I'm looking to use a computed()
+        // value for this purpose instead of iterating through
+        // the listArray.
         
         // Next, remove all places that don't have
         // newValue in their title or feature property
@@ -284,7 +352,7 @@ var viewModel = function() {
         // might be due to length of array changing mid-
         // process??
         
-        for (i = 0; i < data.placeData.length; i++) {
+       /*for (i = 0; i < placesArray.length; i++) {
             var currentPlaceItem = listArray()[i],
                 currentMarker = markers[i],
                 currentPlace = data.placeData[i];
@@ -297,32 +365,20 @@ var viewModel = function() {
             };
             // DO SOMETHING TO HIDE SELECTED MARKER
         };
-    });
+
+    });   */
+
+
+      /* this is now above  
+        this.filterTrue = ko.computed(function() {
         
-   /* not using this method this.filterTrue = ko.computed(function() {
-        //var self = this;
-        if ((this.title +   this.feature).indexOf(self.filter) != -1) {
-            return 'block'
-        } else {
-            return 'none'
-        };
-    }); */
-    
-    // WON'T NEED THIS NOW - 
-    // DELETE AFTER I MAKE SURE I'M RIGHT
-    // Doing this with bindings now
-    // filter: function() {}, // I'm not sure if this is 
-    // atually a function, or if there's
-    // some other way to handle it using 
-    // the text-input binding. 
-    // The idea, is typing in the search box
-    // will trigger (Thru ko) a function
-    // that seearches for that value in the 
-    // values (titels and the "notable draws" fields)
-    // and if the match is false, removes those
-    // items from the array - while at the same time
-    // calling the googleMap API to hide the equivalent
-    // markers. 
+            if ((this.title + this.feature).indexOf(filter()) != -1) {
+                return 'block'
+            } else {
+                return 'none'
+            };
+        }); 
+    */
         
     this.initMap = function() {
         
@@ -339,6 +395,8 @@ var viewModel = function() {
         
         // Add an infoWindow to each marker either inside the above loop or in a separate loop.
         
+        // Code to come
+        
         // Create a single infowindow that appears on clicking marker
         /* var infoWindow = new google.maps.InfoWindow({
              content: 'This is the perfect place for spying on Solar NY'
@@ -351,6 +409,8 @@ var viewModel = function() {
 
      };
     
+    // I might not need the below function depending
+    // on how other stuff shakes down
     this.updatePlaces = function() {
         // loop through both the markers 
         // and the list and display only 
@@ -361,11 +421,10 @@ var viewModel = function() {
 
 };
 
-console.log(viewModel);
-
 ko.applyBindings(viewModel());
 
-/*
+/* Need to figure out why this wasn't working:
+
 Promise.all([data, knockout]).then(function() {
     ko.applyBindings(viewModel);
 }, function() {
