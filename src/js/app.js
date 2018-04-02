@@ -211,33 +211,7 @@ var viewModel = function() {
             })
         }
     }; */
-    
-    this.createMarkers = function() {
-        for (i = 0; i < data.placeData.length; i++) {
-            var marker = new google.maps.Marker({
-                position: data.placeData[i].position,
-                map: this.map,
-                styles: viewModel.mapStyles,
-                title: data.placeData[i].title,
-                filter: data.placeData[i].filter
-            });
-            this.markers.push(marker);
-        };
-    };
-    
-    this.selectPlace = function() {
-        console.log('selected! ' + this.title);
-        
-        // Needs to be called by either a
-        // list item or a marker
-        
-        // Select that marker and 
-        // that list item (through a similar id?),
-        // toggle the selected class on the li,
-        // toggle the infoWindow visibility on the marker, 
-        // and activate the  marker animation.
-    };
-    
+     
     // The filter property keeps track 
     // of the content of the input field,
     // through a data binding in index.html.
@@ -389,26 +363,60 @@ var viewModel = function() {
             mapTypeControl: false
         });
       
-        // Create markers appearing on initialize
-        
-        this.createMarkers();
-        
-        // Add an infoWindow to each marker either inside the above loop or in a separate loop.
-        
-        // Code to come
-        
-        // Create a single infowindow that appears on clicking marker
-        /* var infoWindow = new google.maps.InfoWindow({
-             content: 'This is the perfect place for spying on Solar NY'
-         });
-
-         // Event listener for clicking on marker
-         marker.addListener('click', function() {
-             infoWindow.open(map, marker);
-         });*/
-
-     };
+        var detailInfowindow = new google.maps.InfoWindow();
     
+        this.createMarkers = function() {
+            for (i = 0; i < data.placeData.length; i++) {
+                var marker = new google.maps.Marker({
+                    position: data.placeData[i].position,
+                    map: this.map,
+                    styles: viewModel.mapStyles,
+                    title: data.placeData[i].title,
+                    filter: data.placeData[i].filter
+                });
+                this.markers.push(marker);
+                marker.addListener('click', function() {
+                viewModel.openWindow(this, detailInfowindow);
+              });
+            };
+            
+        // Create markers appearing on initialize
+        this.createMarkers();
+
+        
+        };
+
+        this.openWindow = function(marker, infowindow) {
+            // Check to make sure the infowindow is not already opened on this marker.
+            if (infowindow.marker != marker) {
+                infowindow.marker = marker;
+                infowindow.setContent('<div>' + marker.title + '</div>');
+                // Add Flickr API info here.
+
+                infowindow.open(map, marker);
+                // Make sure the marker property is cleared if the infowindow is closed.
+                infowindow.addListener('closeclick', function() {
+                    infowindow.marker = null;
+                });
+            }
+        }
+    };
+
+
+    this.selectPlace = function() {
+        console.log('selected! ' + this.title);
+
+        // Needs to be called by either a
+        // list item or a marker
+
+        // Select that marker and 
+        // that list item (through a similar id?),
+        // toggle the selected class on the li,
+        // toggle the infoWindow visibility on the marker, 
+        // and activate the  marker animation.
+    };
+
+
     // I might not need the below function depending
     // on how other stuff shakes down
     this.updatePlaces = function() {
@@ -416,7 +424,7 @@ var viewModel = function() {
         // and the list and display only 
         // the one(s) matching the filter
         // which should be recorded in data/
-        
+
     };
 
 };
