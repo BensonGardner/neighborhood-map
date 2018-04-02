@@ -57,7 +57,7 @@ li {
     border-color: #888;
 }
 
-li .selected {
+li .highlighted {
     background-color: #92B281;
 }
 

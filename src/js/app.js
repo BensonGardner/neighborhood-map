@@ -1,4 +1,4 @@
-// This file was previously broken into data.js and viewModel.js, which could be donee again if we can solve the asynch issue with callbacks/promises.
+// This file was previously broken into data.js and viewModel.js, which could be done again if we can solve the asynch issue with callbacks/promises.
 
 var data = {
     mapStart: {lat: 34.0488884, lng: -118.2404842},
@@ -23,194 +23,13 @@ var data = {
     
 };
 
-
 var viewModel = function() {
     
     var self = this;
     
-    this.mapStyles = [
-        {
-            "featureType": "administrative",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "administrative.country",
-            "elementType": "geometry.stroke",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "administrative.province",
-            "elementType": "geometry.stroke",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "landscape",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "visibility": "on"
-                },
-                {
-                    "color": "#e3e3e3"
-                }
-            ]
-        },
-        {
-            "featureType": "landscape.natural",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "poi",
-            "elementType": "all",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "road",
-            "elementType": "all",
-            "stylers": [
-                {
-                    "color": "#cccccc"
-                }
-            ]
-        },
-       /* {
-            "featureType": "road",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },*/
-        {
-            "featureType": "road",
-            "elementType": "labels.text",
-            "stylers": [
-                {
-                    "visibility": "on"
-                },
-                {
-                    "color": "#f4f4f4"
-                },
-            ]
-        },
-        {
-            "featureType": "road",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "visibility": "off"
-                },
-                {
-                    "color": "#222222"
-                },
-            ]
-        },
-        {
-            "featureType": "transit",
-            "elementType": "labels.icon",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "transit.line",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "transit.line",
-            "elementType": "labels.text",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "transit.station.airport",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "transit.station.airport",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "water",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "color": "#FFFFFF"
-                }
-            ]
-        },
-        {
-            "featureType": "water",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        }
-    ];
-    
     this.map = null;
     
     this.markers = [];
-
-    /* I believe the below function will go away,
-       to be replaced by stuff in the subscribe
-       method farther below.
-       
-    this.updateMarkers = function() {
-        for (i = 0; i < this.markers; i++) {
-            markers.forEach(function() {
-                this.visibility = "off";
-                if (this.filter) {
-                    this.visibility = "on";
-                };
-            })
-        }
-    }; */
      
     // The filter property keeps track 
     // of the content of the input field,
@@ -218,40 +37,14 @@ var viewModel = function() {
     this.filter = ko.observable('');
     
     this.listArray = ko.observableArray(JSON.parse(JSON.stringify(data.placeData)));
-
-    /* COMMENTING THIS OUT FOR NOW --
-       I am trying to use the filteredList 
-       approach instead. When I tried this, 
-       I got the message that "display"
-       was not defined when I referenced it in the data
-       binding in index.html.
-       
-    // The computed function in this loop
-    // gets attached to the placeData array to 
-    // keep track of whether one of the list items' 
-    // title or feature properties contains the 
-    // text entered in the filter. 
-    for (i = 0; i < this.listArray.length; i++) {
-
-        var text = this.listArray[i].title + ' ' + 
-            this.listArray[i].feature;
-        
-        this.listArray[i].display = ko.computed(function() {
-            if (filter() == '') {
-                return 'block';
-            }
-            if (text.indexOf(filter()) == -1) {
-                return 'none';
-            } else {
-                return 'block';
-            };
-        });
-        
-        console.log('display() for ' + this.listArray[i].title + ' is ' + this.listArray[i].display());
     
-    };
+    this.listArray().forEach(function(item) {
+        item.selected = ko.observable(false);
+    });
     
-    */
+    /*this.listArray().forEach(function(item) {
+        console.log(item.selected());
+    });*/
     
     // This line creates a copy of the placeData array 
     // from our data model. We need to use the JSON methods
@@ -262,10 +55,10 @@ var viewModel = function() {
     
     this.filteredList = ko.computed(function() {
     
-        if (filter = '') {
-            return listArray;
+        if (this.filter === '') {
+            return this.listArray();
         } else {       
-            listArray().filter(function() {
+            this.listArray().filter(function() {
                 this.listArray.remove(function (item) { 
                     return ((item.title + item.feature).indexOf(this.filter) != -1); 
                 }) 
@@ -273,7 +66,6 @@ var viewModel = function() {
         };  
     });
                                     
-    
     // NOTE TO SELF: I think we need to try to computed() 
     // idea after all. The filter thing isn't working
     // because the length of the array (and thus the index number
@@ -298,12 +90,12 @@ var viewModel = function() {
         // markers to their initial state 
         // (i.e., including all places from 
         // placeData)
-        console.log(listArray().length + '. ');
+        console.log(this.listArray().length + '. ');
         
         //placesArray = JSON.parse(JSON.stringify(data.placeData));
-        //listArray(JSON.parse(JSON.stringify(data.placeData)));
+        //this.listArray(JSON.parse(JSON.stringify(data.placeData)));
         
-        console.log(listArray().length + '. ' + data.placeData.length);
+        console.log(this.listArray().length + '. ' + data.placeData.length);
         
         markers.length = 0;
         createMarkers();
@@ -327,14 +119,14 @@ var viewModel = function() {
         // process??
         
        /*for (i = 0; i < placesArray.length; i++) {
-            var currentPlaceItem = listArray()[i],
+            var currentPlaceItem = this.listArray()[i],
                 currentMarker = markers[i],
                 currentPlace = data.placeData[i];
             console.log((currentPlace.title + currentPlace.feature).indexOf(filter()));
             if ((currentPlace.title + currentPlace.feature).indexOf(filter()) == -1) {
                 console.log((currentPlace.title + currentPlace.feature).indexOf(filter()));
                 console.log("removing " + currentPlaceItem.title);
-                listArray.remove(currentPlaceItem);
+                this.listArray.remove(currentPlaceItem);
                 console.log(data.placeData);
             };
             // DO SOMETHING TO HIDE SELECTED MARKER
@@ -354,6 +146,67 @@ var viewModel = function() {
         }); 
     */
         
+    
+    var detailInfowindow = new google.maps.InfoWindow({
+             content: 'test' // this.title
+         });
+    
+    this.openWindow = function(marker, infowindow) {
+        console.log('infowindow opened');
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+            infowindow.marker = marker;
+            infowindow.setContent('<div>' + marker.title + '</div>');
+
+            // Add Flickr API info here.
+
+            infowindow.open(map, marker);
+            // Make sure the marker property is cleared if the infowindow is closed.
+            infowindow.addListener('closeclick', function() {
+                infowindow.marker = null;
+            });
+        }
+    };
+    
+    // This function, patterned on something 
+    // very similar in Udacity's coursework
+    // leading up to this project, takes a color
+    // and makes a marker in that hue.
+    function makeMarkerIcon(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+          'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+          '|40|_|%E2%80%A2',
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34),
+            new google.maps.Size(21,34));
+        return markerImage;
+    }
+
+    var placeIcon = makeMarkerIcon('2B6D06');
+    
+    this.createMarkers = function() {
+        for (i = 0; i < data.placeData.length; i++) {
+            var marker = new google.maps.Marker({
+                position: data.placeData[i].position,
+                map: this.map,
+                styles: mapStyles,
+                title: data.placeData[i].title,
+                feature: data.placeData[i].feature,
+                icon: placeIcon
+            });
+            this.markers.push(marker);
+            marker.addListener('click', function() {
+                // For some reason, "this.title" is locked
+                // to be whatever the very first click was on
+                console.log('this.title is ' + this.title + '. And marker.title is ' + marker.title);
+                // For some reason if you keep clicking around,
+                // this.title eventually becomes undefined. 
+                selectPlace(this)
+            });
+        };
+    };
+          
     this.initMap = function() {
         
         this.map = new google.maps.Map(document.getElementById('map'), {
@@ -362,60 +215,70 @@ var viewModel = function() {
             styles: this.mapStyles,
             mapTypeControl: false
         });
-      
-        var detailInfowindow = new google.maps.InfoWindow();
-    
-        this.createMarkers = function() {
-            for (i = 0; i < data.placeData.length; i++) {
-                var marker = new google.maps.Marker({
-                    position: data.placeData[i].position,
-                    map: this.map,
-                    styles: viewModel.mapStyles,
-                    title: data.placeData[i].title,
-                    filter: data.placeData[i].filter
-                });
-                this.markers.push(marker);
-                marker.addListener('click', function() {
-                viewModel.openWindow(this, detailInfowindow);
-              });
-            };
             
         // Create markers appearing on initialize
         this.createMarkers();
 
+    };
+
+    // this.selectPlace is called by both 
+    // list items and markers.
+
+    // This function takes the current (selected)
+    // object in the listArray, highilghts that 
+    // item, calls the method to select and animate
+    // the marker It selects a current list item 
+    // and a current marker, highlighting the 
+    // latter and animating the former, and opening
+    // an infowindow on the map. 
+    this.selectPlace = function(place) {
+        // First remove any other selection
+        // that might be in play.
+        listArray().forEach(function(item) {
+            console.log(item.title);
+            console.log(item.selected());
+            item.selected(false);
+        });
+        console.log('selected! ' + place.title);
+
+       // var selectedMarker, 
+         //   selectedListItem;
         
+        console.log(listArray().length);
+        
+        // Next iterate through listArray
+        // and the markers array to find the 
+        // matching item.
+        for (i = 0; i < listArray().length; i++) {
+            console.log(listArray()[i].title);
+            if (listArray()[i].title = place.title) {
+                var selectedListItem = listArray()[i];
+            };
+        if (!selectedListItem) {
+                throw 'Invalid place selected';
+            } 
         };
-
-        this.openWindow = function(marker, infowindow) {
-            // Check to make sure the infowindow is not already opened on this marker.
-            if (infowindow.marker != marker) {
-                infowindow.marker = marker;
-                infowindow.setContent('<div>' + marker.title + '</div>');
-                // Add Flickr API info here.
-
-                infowindow.open(map, marker);
-                // Make sure the marker property is cleared if the infowindow is closed.
-                infowindow.addListener('closeclick', function() {
-                    infowindow.marker = null;
-                });
-            }
-        }
+        
+        for (i = 0; i < markers.length; i++) {
+            if (markers[i].title = place.title) {
+                var selectedMarker = markers[i];
+            };
+            
+        if (!selectedMarker) {
+                throw 'Invalid place selected';
+            };   
+        };
+        
+        console.log(selectedListItem.selected());
+        console.log(selectedMarker.title);
+        
+        selectedListItem.selected(true);
+        
+        // This call is not working. Should I be doing
+        // detailinfowindow.open?
+        // openWindow(selectedMarker, detailInfowindow);   
+        detailInfowindow.open(selectedMarker); 
     };
-
-
-    this.selectPlace = function() {
-        console.log('selected! ' + this.title);
-
-        // Needs to be called by either a
-        // list item or a marker
-
-        // Select that marker and 
-        // that list item (through a similar id?),
-        // toggle the selected class on the li,
-        // toggle the infoWindow visibility on the marker, 
-        // and activate the  marker animation.
-    };
-
 
     // I might not need the below function depending
     // on how other stuff shakes down
@@ -429,8 +292,11 @@ var viewModel = function() {
 
 };
 
-ko.applyBindings(viewModel());
-
+var init = function() {
+    ko.applyBindings(viewModel());
+    initMap();
+};
+    
 /* Need to figure out why this wasn't working:
 
 Promise.all([data, knockout]).then(function() {
