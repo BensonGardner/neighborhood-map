@@ -20,7 +20,7 @@
                         <!-- I tried doing 
                             data-bind="style: { display: display }" 
                         but I got an error that display was undefined.-->
-                        <li data-bind="click: selectPlace, css: { highlighted: selected = true }"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
+                        <li data-bind="click: selectPlace, css: { highlighted: selected = 'selected' }"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
                     </ul>
                 </div>
             </div>

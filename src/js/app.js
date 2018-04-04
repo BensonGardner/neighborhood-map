@@ -39,7 +39,7 @@ var viewModel = function() {
     this.listArray = ko.observableArray(JSON.parse(JSON.stringify(data.placeData)));
     
     this.listArray().forEach(function(item) {
-        item.selected = ko.observable(false);
+        item.selected = ko.observable('notSelected');
     });
     
     /*this.listArray().forEach(function(item) {
@@ -234,17 +234,18 @@ var viewModel = function() {
     this.selectPlace = function(place) {
         // First remove any other selection
         // that might be in play.
+        console.log(this);
         listArray().forEach(function(item) {
+            console.log(listArray());
             console.log(item.title);
-            console.log(item.selected());
-            item.selected(false);
+            console.log(item.selected);
+            //item.selected('notSelected');
+            console.log(item.selected);
         });
         console.log('selected! ' + place.title);
 
-       // var selectedMarker, 
-         //   selectedListItem;
-        
-        console.log(listArray().length);
+        var selectedMarker, 
+            selectedListItem;
         
         // Next iterate through listArray
         // and the markers array to find the 
@@ -253,6 +254,7 @@ var viewModel = function() {
             console.log(listArray()[i].title);
             if (listArray()[i].title = place.title) {
                 var selectedListItem = listArray()[i];
+                console.log('selected! ' + selectedListItem.title);
             };
         if (!selectedListItem) {
                 throw 'Invalid place selected';
@@ -269,10 +271,10 @@ var viewModel = function() {
             };   
         };
         
-        console.log(selectedListItem.selected());
+        console.log(selectedListItem.selected);
         console.log(selectedMarker.title);
         
-        selectedListItem.selected(true);
+        selectedListItem.selected('selected');
         
         // This call is not working. Should I be doing
         // detailinfowindow.open?
