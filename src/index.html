@@ -20,7 +20,11 @@
                         <!-- I tried doing 
                             data-bind="style: { display: display }" 
                         but I got an error that display was undefined.-->
+                        
                         <li data-bind="click: selectPlace, css: { highlighted: selected = 'selected' }"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
+<!-- other version:
+                        <li data-bind="click: selectPlace, visible: filteredIn"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
+-->
                     </ul>
                 </div>
             </div>
@@ -29,11 +33,11 @@
         </div>
         
         <!--<script src="js/data.js" async></script>-->
+        <script src="js/libraries/knockout-3.4.2.js" async defer></script>
+        <script src="js/mapstyles.js" async defer></script>
+        <script src="js/app.js" async defer></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCaf9Ff3b7aKVQV5_4ej_QSxFKKttpFNw&v=3&callback=init"></script>
 
-        <script src="js/libraries/knockout-3.4.2.js" defer></script>
-        <script src="js/mapstyles.js" defer></script>
-        <script src="js/app.js" defer></script>
-        <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCaf9Ff3b7aKVQV5_4ej_QSxFKKttpFNw&v=3&callback=init"></script>
 
         
     </body>

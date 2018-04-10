@@ -27,16 +27,60 @@ var viewModel = function() {
     
     var self = this;
     
-    this.map = null;
+    this.selectPlace = function() {
+        console.log('selected! ' + this.title);
+        
+        // Needs to be called by either a
+        // list item or a marker
+        
+        // Select that marker and 
+        // that list item (through a similar id?),
+        // toggle the selected class on the li,
+        // toggle the infoWindow visibility on the marker, 
+        // and activate the  marker animation.
+    };
     
-    this.markers = [];
-     
     // The filter property keeps track 
     // of the content of the input field,
     // through a data binding in index.html.
     this.filter = ko.observable('');
     
     this.listArray = ko.observableArray(JSON.parse(JSON.stringify(data.placeData)));
+
+    this.filteredIn = ko.pureComputed(function(){
+        console.log(this);
+        return (this.listArray().title.indexOf(filter) + 1);
+    }, this);
+    
+    /* COMMENTING THIS OUT FOR NOW --
+       I am trying to use the filteredList 
+       approach instead. When I tried this, 
+       I got the message that "display"
+       was not defined when I referenced it in the data
+       binding in index.html.
+       
+    // The computed function in this loop
+    // gets attached to the placeData array to 
+    // keep track of whether one of the list items' 
+    // title or feature properties contains the 
+    // text entered in the filter. 
+    for (i = 0; i < this.listArray.length; i++) {
+
+        var text = this.listArray[i].title + ' ' + 
+            this.listArray[i].feature;
+        
+        this.listArray[i].display = ko.computed(function() {
+            if (filter() == '') {
+                return 'block';
+            }
+            if (text.indexOf(filter()) == -1) {
+                return 'none';
+            } else {
+                return 'block';
+            };
+        });
+        
+        console.log('display() for ' + this.listArray[i].title + ' is ' + this.listArray[i].display());
     
     this.listArray().forEach(function(item) {
         item.selected = ko.observable('notSelected');
@@ -53,7 +97,7 @@ var viewModel = function() {
     // If it were the latter, our Knockout methods would
     // alter our original data. 
     
-    this.filteredList = ko.computed(function() {
+/*    this.filteredList = ko.computed(function() {
     
         if (this.filter === '') {
             return this.listArray();
@@ -64,7 +108,7 @@ var viewModel = function() {
                 }) 
             })
         };  
-    });
+    });*/
                                     
     // NOTE TO SELF: I think we need to try to computed() 
     // idea after all. The filter thing isn't working
@@ -145,81 +189,30 @@ var viewModel = function() {
             };
         }); 
     */
+};
+
+var mapControl = {
+    
+    map: null,
+    
+    markers: [],
+
+    initMap: function() {
         
-    
-    var detailInfowindow = new google.maps.InfoWindow({
-             content: 'test' // this.title
-         });
-    
-    this.openWindow = function(marker, infowindow) {
-        console.log('infowindow opened');
-        // Check to make sure the infowindow is not already opened on this marker.
-        if (infowindow.marker != marker) {
-            infowindow.marker = marker;
-            infowindow.setContent('<div>' + marker.title + '</div>');
+        console.log(this + " is this");
 
-            // Add Flickr API info here.
-
-            infowindow.open(map, marker);
-            // Make sure the marker property is cleared if the infowindow is closed.
-            infowindow.addListener('closeclick', function() {
-                infowindow.marker = null;
-            });
-        }
-    };
-    
-    // This function, patterned on something 
-    // very similar in Udacity's coursework
-    // leading up to this project, takes a color
-    // and makes a marker in that hue.
-    function makeMarkerIcon(markerColor) {
-        var markerImage = new google.maps.MarkerImage(
-          'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
-          '|40|_|%E2%80%A2',
-            new google.maps.Size(21, 34),
-            new google.maps.Point(0, 0),
-            new google.maps.Point(10, 34),
-            new google.maps.Size(21,34));
-        return markerImage;
-    }
-
-    var placeIcon = makeMarkerIcon('2B6D06');
-    
-    this.createMarkers = function() {
-        for (i = 0; i < data.placeData.length; i++) {
-            var marker = new google.maps.Marker({
-                position: data.placeData[i].position,
-                map: this.map,
-                styles: mapStyles,
-                title: data.placeData[i].title,
-                feature: data.placeData[i].feature,
-                icon: placeIcon
-            });
-            this.markers.push(marker);
-            marker.addListener('click', function() {
-                // For some reason, "this.title" is locked
-                // to be whatever the very first click was on
-                console.log('this.title is ' + this.title + '. And marker.title is ' + marker.title);
-                // For some reason if you keep clicking around,
-                // this.title eventually becomes undefined. 
-                selectPlace(this)
-            });
-        };
-    };
-          
-    this.initMap = function() {
-        
         this.map = new google.maps.Map(document.getElementById('map'), {
-            center: data.mapStart, 
-            zoom: 13,
-            styles: this.mapStyles,
-            mapTypeControl: false
-        });
-            
+                center: data.mapStart, 
+                zoom: 13,
+                styles: mapStyles,
+                mapTypeControl: false
+            });
+
         // Create markers appearing on initialize
+
         this.createMarkers();
 
-    };
+    },
 
     // this.selectPlace is called by both 
     // list items and markers.
@@ -231,7 +224,7 @@ var viewModel = function() {
     // and a current marker, highlighting the 
     // latter and animating the former, and opening
     // an infowindow on the map. 
-    this.selectPlace = function(place) {
+    selectPlace: function(place) {
         // First remove any other selection
         // that might be in play.
         console.log(this);
@@ -280,23 +273,107 @@ var viewModel = function() {
         // detailinfowindow.open?
         // openWindow(selectedMarker, detailInfowindow);   
         detailInfowindow.open(selectedMarker); 
-    };
+    },
+           
+    updateMarkers: function() {
+        for (i = 0; i < this.markers; i++) {
+            markers.forEach(function() {
+                this.visibility = "off";
+                if (this.filter) {
+                    this.visibility = "on";
+                };
+            })
+        }
+    },
+    
+    createMarkers: function() {
+        for (i = 0; i < data.placeData.length; i++) {
+            var marker = new google.maps.Marker({
+                position: data.placeData[i].position,
+                map: this.map,
+                styles: mapStyles,
+                title: data.placeData[i].title,
+                filter: data.placeData[i].filter
+            });
+            this.markers.push(marker);
+        };
+    },
+    
+    detailInfowindow: new google.maps.InfoWindow({
+         content: 'test' // this.title
+    }),
+    
+    openWindow: function(marker, infowindow) {
+        console.log('infowindow opened');
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+            infowindow.marker = marker;
+            infowindow.setContent('<div>' + marker.title + '</div>');
 
+            // Add Flickr API info here.
+
+            infowindow.open(map, marker);
+            // Make sure the marker property is cleared if the infowindow is closed.
+            infowindow.addListener('closeclick', function() {
+                infowindow.marker = null;
+            });
+        }
+    },
+    
+    // This function, patterned on something 
+    // very similar in Udacity's coursework
+    // leading up to this project, takes a color
+    // and makes a marker in that hue.
+    makeMarkerIcon: function(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+          'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+          '|40|_|%E2%80%A2',
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34),
+            new google.maps.Size(21,34));
+        return markerImage;
+    },
+
+    placeIcon: function() {
+        makeMarkerIcon('2B6D06')
+    },
+    
+    createMarkers: function() {
+        for (i = 0; i < data.placeData.length; i++) {
+            var marker = new google.maps.Marker({
+                position: data.placeData[i].position,
+                map: this.map,
+                styles: mapStyles,
+                title: data.placeData[i].title,
+                feature: data.placeData[i].feature,
+                icon: placeIcon
+            });
+            this.markers.push(marker);
+            marker.addListener('click', function() {
+                // For some reason, "this.title" is locked
+                // to be whatever the very first click was on
+                console.log('this.title is ' + this.title + '. And marker.title is ' + marker.title);
+                // For some reason if you keep clicking around,
+                // this.title eventually becomes undefined. 
+                selectPlace(this)
+            });
+        };
+    },
+    
     // I might not need the below function depending
     // on how other stuff shakes down
-    this.updatePlaces = function() {
+    updatePlaces: function() {
         // loop through both the markers 
         // and the list and display only 
         // the one(s) matching the filter
-        // which should be recorded in data/
-
-    };
-
+        // which should be recorded in data
+    }
 };
 
 var init = function() {
     ko.applyBindings(viewModel());
-    initMap();
+    mapControl.initMap();
 };
     
 /* Need to figure out why this wasn't working:
