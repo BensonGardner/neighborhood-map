@@ -28,171 +28,6 @@ var viewModel = function() {
     
     var self = this;
     
-    this.mapStyles = [
-        {
-            "featureType": "administrative",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "administrative.country",
-            "elementType": "geometry.stroke",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "administrative.province",
-            "elementType": "geometry.stroke",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "landscape",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "visibility": "on"
-                },
-                {
-                    "color": "#e3e3e3"
-                }
-            ]
-        },
-        {
-            "featureType": "landscape.natural",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "poi",
-            "elementType": "all",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "road",
-            "elementType": "all",
-            "stylers": [
-                {
-                    "color": "#cccccc"
-                }
-            ]
-        },
-       /* {
-            "featureType": "road",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },*/
-        {
-            "featureType": "road",
-            "elementType": "labels.text",
-            "stylers": [
-                {
-                    "visibility": "on"
-                },
-                {
-                    "color": "#f4f4f4"
-                },
-            ]
-        },
-        {
-            "featureType": "road",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "visibility": "off"
-                },
-                {
-                    "color": "#222222"
-                },
-            ]
-        },
-        {
-            "featureType": "transit",
-            "elementType": "labels.icon",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "transit.line",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "transit.line",
-            "elementType": "labels.text",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "transit.station.airport",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "transit.station.airport",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "water",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "color": "#FFFFFF"
-                }
-            ]
-        },
-        {
-            "featureType": "water",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        }
-    ];
-    
     this.map = null;
     
     this.markers = [];
@@ -245,6 +80,11 @@ var viewModel = function() {
     
     this.listArray = ko.observableArray(JSON.parse(JSON.stringify(data.placeData)));
 
+    this.filteredIn = ko.pureComputed(function(){
+        console.log(this);
+        return (this.listArray().title.indexOf(filter) + 1);
+    }, this);
+    
     /* COMMENTING THIS OUT FOR NOW --
        I am trying to use the filteredList 
        approach instead. When I tried this, 
@@ -286,7 +126,7 @@ var viewModel = function() {
     // If it were the latter, our Knockout methods would
     // alter our original data. 
     
-    this.filteredList = ko.computed(function() {
+/*    this.filteredList = ko.computed(function() {
     
         if (filter = '') {
             return listArray;
@@ -297,7 +137,7 @@ var viewModel = function() {
                 }) 
             })
         };  
-    });
+    });*/
                                     
     
     // NOTE TO SELF: I think we need to try to computed() 
@@ -389,7 +229,7 @@ initMap = function() {
     this.map = new google.maps.Map(document.getElementById('map'), {
             center: data.mapStart, 
             zoom: 13,
-            styles: this.mapStyles,
+            styles: mapStyles,
             mapTypeControl: false
         });
       
