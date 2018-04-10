@@ -52,7 +52,7 @@ var viewModel = function() {
             var marker = new google.maps.Marker({
                 position: data.placeData[i].position,
                 map: this.map,
-                styles: viewModel.mapStyles,
+                styles: mapStyles,
                 title: data.placeData[i].title,
                 filter: data.placeData[i].filter
             });
