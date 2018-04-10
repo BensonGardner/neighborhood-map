@@ -380,9 +380,13 @@ var viewModel = function() {
         }); 
     */
         
-    this.initMap = function() {
+};
+
+initMap = function() {
         
-        this.map = new google.maps.Map(document.getElementById('map'), {
+    console.log(this + " is this");
+    
+    this.map = new google.maps.Map(document.getElementById('map'), {
             center: data.mapStart, 
             zoom: 13,
             styles: this.mapStyles,
@@ -391,7 +395,7 @@ var viewModel = function() {
       
         // Create markers appearing on initialize
         
-        this.createMarkers();
+    this.createMarkers();
         
         // Add an infoWindow to each marker either inside the above loop or in a separate loop.
         
@@ -417,8 +421,6 @@ var viewModel = function() {
         // the one(s) matching the filter
         // which should be recorded in data/
         
-    };
-
 };
 
 ko.applyBindings(viewModel());
