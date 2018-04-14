@@ -1,5 +1,6 @@
 // This file was previously broken into data.js and viewModel.js, which could be done again if we can solve the asynch issue with callbacks/promises.
 
+
 var data = {
     mapStart: {lat: 34.0488884, lng: -118.2404842},
     
@@ -30,8 +31,8 @@ var viewModel = function() {
     this.selectPlace = function() {
         console.log('selected! ' + this.title);
         
-        // Needs to be called by either a
-        // list item or a marker
+        // Needs to be called by 
+        // list item 
         
         // Select that marker and 
         // that list item (through a similar id?),
@@ -45,8 +46,20 @@ var viewModel = function() {
     // through a data binding in index.html.
     this.filter = ko.observable('');
     
+    // Make a copy of the placeData array so we can alter
+    // it as needed.
+    // It looks like there are some array methods that are
+    // more elegant that might be better here.
     this.listArray = ko.observableArray(JSON.parse(JSON.stringify(data.placeData)));
 
+    // Return a version of listArray that only includes
+    // entries which contain the filter.
+    // (It works like this: the .indexOf() method will
+    // return a value of -1 if the term is not present.  
+    // If the search term IS present, then 0 is the lowest 
+    // possible value. So adding one and testing for 
+    // truthiness should result in a test for whether or 
+    // not the term is present.)
     this.filteredIn = ko.pureComputed(function(){
         console.log(this);
         return (this.listArray().title.indexOf(filter) + 1);
@@ -232,7 +245,7 @@ var mapControl = {
             console.log(listArray());
             console.log(item.title);
             console.log(item.selected);
-            //item.selected('notSelected');
+            item.selected('notSelected');
             console.log(item.selected);
         });
         console.log('selected! ' + place.title);
@@ -299,9 +312,11 @@ var mapControl = {
         };
     },
     
-    detailInfowindow: new google.maps.InfoWindow({
-         content: 'test' // this.title
-    }),
+    detailInfowindow: function() {
+        var newInfoWindow = new google.maps.InfoWindow({
+            content: 'test' // this.title
+        })
+    },
     
     openWindow: function(marker, infowindow) {
         console.log('infowindow opened');
@@ -347,7 +362,7 @@ var mapControl = {
                 styles: mapStyles,
                 title: data.placeData[i].title,
                 feature: data.placeData[i].feature,
-                icon: placeIcon
+                //icon: this.placeIcon
             });
             this.markers.push(marker);
             marker.addListener('click', function() {
@@ -370,11 +385,6 @@ var mapControl = {
         // which should be recorded in data
     }
 };
-
-var init = function() {
-    ko.applyBindings(viewModel());
-    mapControl.initMap();
-};
     
 /* Need to figure out why this wasn't working:
 
@@ -384,3 +394,8 @@ Promise.all([data, knockout]).then(function() {
     document.getElementById('list').append('Failed to load required files. Please try refreshing the page.');
 });
 */
+
+var init = function() {
+    ko.applyBindings(viewModel());
+    mapControl.initMap();
+};
