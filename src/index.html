@@ -15,29 +15,18 @@
                 <!-- The filter div and list use Knockout's data-bindings to automatically update and filter the place list -->
 
                 <div id="select-zone">
-                    <input data-bind="textInput: filter" id="filter-input">
+                    <input data-bind="textInput: filter" id="filter-input" placeholder="Search">
                     <ul id="list" data-bind="foreach: listArray">
-                        <!-- I tried doing 
-                            data-bind="style: { display: display }" 
-                        but I got an error that display was undefined.-->
-                        
                         <li data-bind="click: selectPlace, visible: filteredIn, css: { highlighted: selected = 'selected' }"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
-                        <!--data-bind that isn't working --- visible: filteredIn, --> 
-
                     </ul>
                 </div>
             </div>
             <div id="map"></div>
-
         </div>
-        
         <!--<script src="js/data.js" async></script>-->
         <script src="js/libraries/knockout-3.4.2.js" async defer></script>
         <script src="js/mapstyles.js" async defer></script>
         <script src="js/app.js" async defer></script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCaf9Ff3b7aKVQV5_4ej_QSxFKKttpFNw&v=3&callback=init"></script>
-
-
-        
     </body>
 </html>

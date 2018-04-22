@@ -18,9 +18,21 @@ var data = {
             selected: false
         },
         {
-            title: 'test',
-            position: {lat: 34.5, lng: -118.5},
-            feature: '',
+            title: 'Nijiya Market',
+            position: {lat: 34.0486833, lng: -118.2425657},
+            feature: 'Produce, food, snacks',
+            selected: false
+        },
+        {
+            title: 'Japanese American National Museum',
+            position: {lat: 34.049451, lng: -118.2409777},
+            feature: 'Art, Hello Kitty Con',
+            selected: false
+        },
+        {
+            title: 'Tea Master Cafe & Tea Shop',
+            position: {lat: 34.0483476, lng: -118.2413596},
+            feature: 'Green tea plus matcha ice cream and smoothies',
             selected: false
         }
     ],
@@ -108,11 +120,13 @@ var mapControl = {
     initMap: function() {
 
         this.map = new google.maps.Map(document.getElementById('map'), {
-                center: data.mapStart, 
-                zoom: 13,
+                //center: data.mapStart, 
+                //zoom: 13,
                 styles: mapStyles,
                 mapTypeControl: false
             });
+        
+        this.bounds = new google.maps.LatLngBounds();
 
         // Create image for marker icon
         this.markerImage = new google.maps.MarkerImage(
@@ -135,7 +149,7 @@ var mapControl = {
         
         // Then update which place is selected and re-render markers
         
-    
+        console.log(viewModel.filterWords);
         mapControl.renderMarkers(viewModel.filterWords);
 
         // Then open the right infowindow
@@ -155,6 +169,9 @@ var mapControl = {
         // NOTE: Does the fact that this function is called
         // from an event Listener set up within the viewModel break
         // the rule of not having Knockout handle the Maps API?
+        // If so, I could instead set an event listener outside
+        // the viewModel, maybe on the whole window to listen for a 
+        // keystroke.
             
         for (i = 0; i < data.placeData.length; i++) {
             console.log(data.placeData.length);
@@ -172,28 +189,32 @@ var mapControl = {
             // we want. 
 
             // We'll use a similar technique to filter the markers
-            // as we used to filter the list in the viewModel.
-
-            var markerInfo = (marker.title + ' ' + marker.feature).toLowerCase();
-            console.log(markerInfo);
+            // as we use to filter the list in the viewModel.
+            var markerInfo = (marker.title + ' ' + 
+                              marker.feature).toLowerCase();
             var value = 1;
             for (j = 0; j < filterArray.length; j++) {
                 value *= (markerInfo.indexOf(filterArray[j]) + 1);
             }
             
-            console.log(marker.title + ' value is ' + value + ' or ' +  Boolean(value));
-            
-            
             // Set the marker to be visible only if the value
             // is true, then add it to the markers array.
             marker.setVisible(Boolean(value));
+            
             this.markers.push(marker);
-            console.log(marker.title);
             var markerTitle = marker.title;
+            
+            // Extend the boundaries of the map for each marker and display the marker. 
+            this.bounds.extend(this.markers[i].position);
             
             // Add an event listener to each marker for
             // being clicked.
             marker.addListener('click', function() {
+                console.log(marker.title);
+                // First de-select all markers
+                // STUFF
+                // Make the selected marker bounce
+               // marker.setAnimation();
                 // For some reason, "this.title" is locked
                 // to be whatever the very first click was on
                 console.log('this.parent is ' + this.parentNode + '. And marker.title is ' + markerTitle);
@@ -205,6 +226,7 @@ var mapControl = {
                 mapControl.detailInfoWindow.open(map, this);  
             });
         }
+        this.map.fitBounds(this.bounds);
     },
     
     detailInfowindow: function(selectedMarker) {
@@ -222,6 +244,7 @@ var mapControl = {
         // the one(s) matching the filter
         // which should be recorded in data
     }
+
 };
 
 var init = function() {
