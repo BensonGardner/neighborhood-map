@@ -43,17 +43,44 @@ var viewModel = function() {
     
     var self = this;
     
-    this.filterWords = [];
+    console.log(self);
     
-    this.selectPlace = function() {
+    viewModel.filterWords = [];
+    
+    this.selectPlace = function(listItem) {
         // Needs to be called by 
         // list item 
-            
+        
+        console.log(listItem);
+        
+        // Set the value of "selected" to "true" for 
+        // the right data.placeData entry.
+    
+        // Close any open infowindow.
+        
+        mapControl.infowindow.close();
+        
+        // Open the infowindow on the marker with the matching title.
+        
+        for (i = 0; i < mapControl.markers.length; i++) {
+            console.log(listItem.title);
+            if (listItem.title = mapControl.markers[i].title) {
+                console.log(mapControl.markers[i].title);
+                mapControl.infowindow.open(mapControl.map, mapControl.markers[i]);
+            }
+        }    
+         
+        
         // Select that marker and 
         // that list item (through a similar id?),
         // toggle the selected class on the li,
         // toggle the infoWindow visibility on the marker, 
         // and activate the  marker animation.
+        
+        // I'm not sure if there's any need to go about 
+        // this task in this fashion, or to have a "selected"
+        // property on the items in data.placeData.
+        
     };
     
     // The filter property keeps track 
@@ -107,7 +134,8 @@ var viewModel = function() {
 
     window.addEventListener('input', function(event) {
         console.log('input happened');
-        mapControl.renderMarkers(self.filterWords);
+        console.log(self.filterWords + ' ' + this.filterWords);
+        mapControl.renderMarkers(viewModel  .filterWords);
     });
 };
 
@@ -136,30 +164,49 @@ var mapControl = {
             new google.maps.Point(10, 34),
             new google.maps.Size(21,34)
         );
-        
+
+        // Create an infowindow object, which shall
+        // remain empty until a marker is clicked.
+        this.infowindow =  new google.maps.InfoWindow({
+            content: ''
+        });
+
         // Create markers appearing on initialize
 
         this.renderMarkers([]);
 
     },
 
-    selectPlace: function(place) {
+    selectPlace: function(marker) {
         // First remove any other selection
         // that might be in play.
         
+        console.log(marker);
+        
+        mapControl.infowindow.close();
+        
+        // Stuff
+        
         // Then update which place is selected and re-render markers
         
-        console.log(viewModel.filterWords);
         mapControl.renderMarkers(viewModel.filterWords);
 
         // Then open the right infowindow
         
-        mapControl.detailInfowindow.open(map, selectedMarker); 
+        mapControl.infowindow.open(mapControl.map, marker); 
+        
+        // Then highlight the right list item
+        
+        
     
     },
         
    renderMarkers: function(filterArray) {
-        
+       
+       console.log(filterArray);
+       console.log(viewModel);
+       console.log(viewModel.filterWords);
+       
        // First delete all existing markers.
        
        this.markers.forEach(function(element) {
@@ -202,7 +249,7 @@ var mapControl = {
             marker.setVisible(Boolean(value));
             
             this.markers.push(marker);
-            var markerTitle = marker.title;
+            let markerTitle = marker.title;
             
             // Extend the boundaries of the map for each marker and display the marker. 
             this.bounds.extend(this.markers[i].position);
@@ -210,7 +257,8 @@ var mapControl = {
             // Add an event listener to each marker for
             // being clicked.
             marker.addListener('click', function() {
-                console.log(marker.title);
+                console.log(this);
+                console.log(markerTitle);
                 // First de-select all markers
                 // STUFF
                 // Make the selected marker bounce
@@ -223,19 +271,12 @@ var mapControl = {
                 // Also, when you click on a marker "this" is 
                 // undefined.
                 mapControl.selectPlace(this);
-                mapControl.detailInfoWindow.open(map, this);  
+//                mapControl.detailInfoWindow.open(map, this);  
             });
         }
         this.map.fitBounds(this.bounds);
     },
-    
-    detailInfowindow: function(selectedMarker) {
-        var newInfoWindow = new google.maps.InfoWindow({
-            content: selectedMarker.title
-            // Flickr content will be pulled from data obj here
-        })
-    },
-  
+      
     // I might not need the below function depending
     // on how other stuff shakes down
     updatePlaces: function() {
