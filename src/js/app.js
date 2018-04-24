@@ -133,9 +133,7 @@ var viewModel = function() {
     });
 
     window.addEventListener('input', function(event) {
-        console.log('input happened');
-        console.log(self.filterWords + ' ' + this.filterWords);
-        mapControl.renderMarkers(viewModel  .filterWords);
+        mapControl.renderMarkers(this.filterWords);
     });
 };
 
