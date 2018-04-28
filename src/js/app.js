@@ -47,17 +47,17 @@ var viewModel = function() {
     
     viewModel.filterWords = [];
     
-    self.selected = ko.observable({});
-    
+    viewModel.selected = ko.observable({});
+
+    // Called by each list item, by means of
+    // data bindings in index.html
     this.selectPlace = function(listItem) {
-        // Needs to be called by 
-        // list item 
-        
-        self.selected(this);
+
+        viewModel.selected(this);
         
         console.log(listItem.title);
         
-        console.log(self.selected().title);
+        console.log(viewModel.selected().title);
         
         console.log(this);
         
@@ -77,18 +77,6 @@ var viewModel = function() {
                 mapControl.infowindow.open(mapControl.map, mapControl.markers[i]);
             }
         }    
-         
-        
-        // Select that marker and 
-        // that list item (through a similar id?),
-        // toggle the selected class on the li,
-        // toggle the infoWindow visibility on the marker, 
-        // and activate the  marker animation.
-        
-        // I'm not sure if there's any need to go about 
-        // this task in this fashion, or to have a "selected"
-        // property on the items in data.placeData.
-        
     };
     
     // The filter property keeps track 
@@ -139,12 +127,12 @@ var viewModel = function() {
             return value;
         });
         
-        item.highlighted = ko.computed(function() {
-            console.log(item.title + ' and ' + self.selected().title);
-            console.log(Boolean(item.title == self.selected().title));
-            return Boolean(item.title == self.selected().title);
-            
+        item.isSelected = ko.computed(function() {
+            console.log(item.title + ' and ' + viewModel.selected().title);
+            console.log(item.title == viewModel.selected().title);
+            return (item.title == viewModel.selected().title);
         });
+        console.log(item.title + ' is selected? ' + item.isSelected());
     });
 
     window.addEventListener('input', function(event) {
