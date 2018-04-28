@@ -4,6 +4,7 @@
 var data = {
     mapStart: {lat: 34.0488884, lng: -118.2404842},
     
+    // Most likely I'll take all the selected values out of this array
     placeData: [
         {
             title: 'Japanese Village Plaza', 
@@ -35,8 +36,7 @@ var data = {
             feature: 'Green tea plus matcha ice cream and smoothies',
             selected: false
         }
-    ],
-    
+    ]  
 };
 
 var viewModel = function() {
@@ -47,11 +47,19 @@ var viewModel = function() {
     
     viewModel.filterWords = [];
     
+    self.selected = ko.observable({});
+    
     this.selectPlace = function(listItem) {
         // Needs to be called by 
         // list item 
         
-        console.log(listItem);
+        self.selected(this);
+        
+        console.log(listItem.title);
+        
+        console.log(self.selected().title);
+        
+        console.log(this);
         
         // Set the value of "selected" to "true" for 
         // the right data.placeData entry.
@@ -64,7 +72,7 @@ var viewModel = function() {
         
         for (i = 0; i < mapControl.markers.length; i++) {
             console.log(listItem.title);
-            if (listItem.title = mapControl.markers[i].title) {
+            if (listItem.title == mapControl.markers[i].title) {
                 console.log(mapControl.markers[i].title);
                 mapControl.infowindow.open(mapControl.map, mapControl.markers[i]);
             }
@@ -99,7 +107,7 @@ var viewModel = function() {
         // Determine whether each item should be filtered in
         // (i.e. displayed in the list) by using a ko.computed 
         // observable.
-        item.filteredIn = ko.computed(function(){
+        item.filteredIn = ko.computed(function() {
             // Break the text input into an array of separate 
             // words, case insensitive.
             self.filterWords = filter().toLowerCase().split(' ');
@@ -129,6 +137,13 @@ var viewModel = function() {
                 value *= (itemInfo.indexOf(self.filterWords[i]) + 1);
             };
             return value;
+        });
+        
+        item.highlighted = ko.computed(function() {
+            console.log(item.title + ' and ' + self.selected().title);
+            console.log(Boolean(item.title == self.selected().title));
+            return Boolean(item.title == self.selected().title);
+            
         });
     });
 
