@@ -33,7 +33,7 @@ var data = {
         {
             title: 'Tea Master Cafe & Tea Shop',
             position: {lat: 34.0483476, lng: -118.2413596},
-            feature: 'Green tea plus matcha ice cream and smoothies',
+            feature: 'Green tea, matcha ice cream, smoothies',
             selected: false
         }
     ]  
@@ -110,7 +110,7 @@ var viewModel = function() {
         item.filteredIn = ko.computed(function() {
             // Break the text input into an array of separate 
             // words, case insensitive.
-            self.filterWords = filter().toLowerCase().split(' ');
+            viewModel.filterWords = filter().toLowerCase().split(' ');
             
             // Put all the item together in case insensitive fashion.
             var itemInfo = (item.title + ' ' + item.feature).toLowerCase();
@@ -133,8 +133,8 @@ var viewModel = function() {
             // zero if any of the words doesn't appear.
             
             var value = 1;
-            for (i = 0; i < self.filterWords.length; i++) {
-                value *= (itemInfo.indexOf(self.filterWords[i]) + 1);
+            for (i = 0; i < viewModel.filterWords.length; i++) {
+                value *= (itemInfo.indexOf(viewModel.filterWords[i]) + 1);
             };
             return value;
         });
@@ -148,7 +148,7 @@ var viewModel = function() {
     });
 
     window.addEventListener('input', function(event) {
-        mapControl.renderMarkers(this.filterWords);
+        mapControl.renderMarkers(viewModel.filterWords);
     });
 };
 
