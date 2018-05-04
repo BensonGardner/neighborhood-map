@@ -35,6 +35,12 @@ var data = {
             position: {lat: 34.0483476, lng: -118.2413596},
             feature: 'Green tea, matcha ice cream, smoothies',
             selected: false
+        },
+        {
+            title: 'James Irvine Japanese Garden',
+            position: {lat: 34.047643, lng: -118.2436656},
+            feature: '"Garden of the Clear Stream"',
+            selected: false
         }
     ]  
 };
@@ -72,7 +78,7 @@ var viewModel = function() {
         
         for (i = 0; i < mapControl.markers.length; i++) {
             console.log(listItem.title);
-            if (listItem.title == mapControl.markers[i].title) {
+            if (listItem.title === mapControl.markers[i].title) {
                 console.log(mapControl.markers[i].title);
                 mapControl.infowindow.open(mapControl.map, mapControl.markers[i]);
             }
@@ -150,7 +156,7 @@ var mapControl = {
 
         this.map = new google.maps.Map(document.getElementById('map'), {
                 //center: data.mapStart, 
-                //zoom: 13,
+                zoom: 11,
                 styles: mapStyles,
                 mapTypeControl: false
             });
@@ -179,11 +185,10 @@ var mapControl = {
     },
 
     selectPlace: function(marker) {
-        // First remove any other selection
-        // that might be in play.
-        
         console.log(marker);
         
+        // First remove any other selection
+        // that might be in play.        
         mapControl.infowindow.close();
         
         // Stuff
@@ -192,17 +197,31 @@ var mapControl = {
         
         mapControl.renderMarkers(viewModel.filterWords);
 
+        // Make the selected marker bounce
+        mapControl.toggleBounce(marker);
+        
         // Then open the right infowindow
         
         mapControl.infowindow.open(mapControl.map, marker); 
         
         // Then highlight the right list item
-        
-        
-    
+        // STUFF
     },
+    
+    toggleBounce: function(marker) {
+        console.log(marker.getAnimation());
+        console.log(marker.title);
+        if (marker.getAnimation() !== null) {
+          marker.setAnimation(null);
+        } else {
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+        }
+        console.log(marker.getAnimation());
+      },
         
    renderMarkers: function(filterArray) {
+       
+       console.log(this.bounds); // works...
        
        console.log(filterArray);
        console.log(viewModel);
@@ -229,7 +248,8 @@ var mapControl = {
                 map: this.map,
                 title: data.placeData[i].title,
                 feature: data.placeData[i].feature,
-                icon: this.markerImage
+                icon: this.markerImage,
+                animation: null,
             });
                          
             // Using the filterWords/filterArray value 
@@ -253,7 +273,7 @@ var mapControl = {
             let markerTitle = marker.title;
             
             // Extend the boundaries of the map for each marker and display the marker. 
-            this.bounds.extend(this.markers[i].position);
+            this.bounds.extend(this.markers[i].position); // works
             
             // Add an event listener to each marker for
             // being clicked.
@@ -262,19 +282,12 @@ var mapControl = {
                 console.log(markerTitle);
                 // First de-select all markers
                 // STUFF
-                // Make the selected marker bounce
-               // marker.setAnimation();
-                // For some reason, "this.title" is locked
-                // to be whatever the very first click was on
-                console.log('this.parent is ' + this.parentNode + '. And marker.title is ' + markerTitle);
-                // For some reason if you keep clicking around,
-                // this.title eventually becomes undefined. 
-                // Also, when you click on a marker "this" is 
-                // undefined.
-                mapControl.selectPlace(this);
-//                mapControl.detailInfoWindow.open(map, this);  
+
+                mapControl.selectPlace(this); 
+
             });
         }
+        console.log(this.map); // works
         this.map.fitBounds(this.bounds);
     },
       
