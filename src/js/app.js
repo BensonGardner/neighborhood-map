@@ -2,47 +2,63 @@
 
 
 var data = {
-    mapStart: {lat: 34.0488884, lng: -118.2404842},
     
     // Most likely I'll take all the selected values out of this array
     placeData: [
         {
             title: 'Japanese Village Plaza', 
             position: {lat: 34.0488884, lng: -118.2404842},
-            feature: 'Anime Idol Competition',
-            selected: false
+            feature: 'Anime Idol Competition'
+            
         },
         {
             title: 'Mitsuru Cafe',
             position: {lat: 34.0489316, lng: -118.2416973},
-            feature: 'Delicious sweet/salty dango',
-            selected: false
+            feature: 'Delicious sweet/salty dango'
+            
         },
         {
             title: 'Nijiya Market',
             position: {lat: 34.0486833, lng: -118.2425657},
-            feature: 'Produce, food, snacks',
-            selected: false
+            feature: 'Produce, food, snacks'
+            
         },
         {
             title: 'Japanese American National Museum',
             position: {lat: 34.049451, lng: -118.2409777},
-            feature: 'Art, Hello Kitty Con',
-            selected: false
+            feature: 'Art, Hello Kitty Con'
+            
         },
         {
             title: 'Tea Master Cafe & Tea Shop',
             position: {lat: 34.0483476, lng: -118.2413596},
-            feature: 'Green tea, matcha ice cream, smoothies',
-            selected: false
+            feature: 'Green tea, matcha ice cream, smoothies'
+            
         },
         {
             title: 'James Irvine Japanese Garden',
             position: {lat: 34.047643, lng: -118.2436656},
-            feature: '"Garden of the Clear Stream"',
-            selected: false
+            feature: '"Garden of the Clear Stream"'
+            
         }
-    ]  
+    ],
+    
+    // This function loads Flickr photos for each of the locations. 
+    getFlickr: function() {
+        
+        var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
+            ', ' + mapControl.bounds.b.f + ', ' + mapControl.bounds.f.f;
+
+        for (i = 0; i < data.placeData.length; i++) {
+            var placeText = data.placeData[i].title;
+            var flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&text=' + placeText + '&bbox=' + bbox;    
+            data.placeData[i].flickr = $.getJSON(flickrURL)
+                .fail(function(){
+                    data.placeData.flickr = {title: 'Unable to load photos.'};
+                });
+        };
+    
+    }
 };
 
 var viewModel = function() {
@@ -53,36 +69,51 @@ var viewModel = function() {
     
     viewModel.filterWords = [];
     
-    viewModel.selected = ko.observable({});
-
-    // Called by each list item, by means of
-    // data bindings in index.html
-    this.selectPlace = function(listItem) {
-
-        viewModel.selected(this);
+    viewModel.highlight = function(k) {
+        console.log(k); // i'm stillc alling teh function with an object. need to change that i order to test
         
-        console.log(listItem.title);
+        console.log(window.listArray()[k]);
         
-        console.log(viewModel.selected().title);
+        viewModel().listArray()[k].isSelected = true;
         
-        console.log(this);
+        // Shouldn't need this
+        // viewModel.selected(this);
         
-        // Set the value of "selected" to "true" for 
-        // the right data.placeData entry.
-    
-        // Close any open infowindow.
+        // There might be a way to refactor this next bit
+        // so that when we render markers we are always
+        // passing an array of index values which will 
+        // correspond to particular markers that will 
+        // then be fit within the view.
+        // Make sure the selected place is within the 
+        // map's visible bounds
+        if (!mapControl.map.getBounds().contains(this.position)) {
+            mapControl.bounds.extend(this.position);
+            mapControl.map.panToBounds(mapControl.bounds);
+        };
         
-        mapControl.infowindow.close();
-        
-        // Open the infowindow on the marker with the matching title.
-        
+        /* Shouldn't need this
         for (i = 0; i < mapControl.markers.length; i++) {
             console.log(listItem.title);
             if (listItem.title === mapControl.markers[i].title) {
                 console.log(mapControl.markers[i].title);
-                mapControl.infowindow.open(mapControl.map, mapControl.markers[i]);
             }
-        }    
+        }   */
+    }
+    
+    // shouldn't need this
+    // viewModel.selected = ko.observable({});
+    
+    // Called by each list item, by means of
+    // data bindings in index.html
+    self.selectPlace = function(l) {
+        // We are passing the index value 
+        // from the listArray. Using this 
+        // l value (i), we can select
+        // the correct place from the listArray
+        // and the mapControl, also highlighting 
+        // the correct list item. 
+        viewModel.highlight(l);
+        mapControl.selectPlace(l);
     };
     
     // The filter property keeps track 
@@ -97,6 +128,11 @@ var viewModel = function() {
     this.listArray = ko.observableArray(JSON.parse(JSON.stringify(data.placeData))); 
     
     this.listArray().forEach(function(item) {
+        
+        // To begin with, no item is selected.
+        item.isSelected = false;
+        
+        
 
         // Determine whether each item should be filtered in
         // (i.e. displayed in the list) by using a ko.computed 
@@ -131,18 +167,11 @@ var viewModel = function() {
                 value *= (itemInfo.indexOf(viewModel.filterWords[i]) + 1);
             };
             return value;
-        });
-        
-        item.isSelected = ko.computed(function() {
-            console.log(item.title + ' and ' + viewModel.selected().title);
-            console.log(item.title == viewModel.selected().title);
-            return (item.title == viewModel.selected().title);
-        });
-        console.log(item.title + ' is selected? ' + item.isSelected());
-    });
+        });   
 
     window.addEventListener('input', function(event) {
         mapControl.renderMarkers(viewModel.filterWords);
+    });
     });
 };
 
@@ -155,8 +184,8 @@ var mapControl = {
     initMap: function() {
 
         this.map = new google.maps.Map(document.getElementById('map'), {
-                //center: data.mapStart, 
-                zoom: 11,
+                // We don't need "center" or "zoom" values 
+                // because we'll fit the bounds to the markers.
                 styles: mapStyles,
                 mapTypeControl: false
             });
@@ -174,7 +203,7 @@ var mapControl = {
 
         // Create an infowindow object, which shall
         // remain empty until a marker is clicked.
-        this.infowindow =  new google.maps.InfoWindow({
+        this.infowindow = new google.maps.InfoWindow({
             content: ''
         });
 
@@ -184,33 +213,49 @@ var mapControl = {
 
     },
 
-    selectPlace: function(marker) {
-        console.log(marker);
+    selectPlace: function(l) {
+        
+        console.log(l);
         
         // First remove any other selection
         // that might be in play.        
         mapControl.infowindow.close();
         
-        // Stuff
-        
+        // Why would we need to render the markers at this moment?
         // Then update which place is selected and re-render markers
-        
-        mapControl.renderMarkers(viewModel.filterWords);
-
+        // viewModel.selected(this); // "this" might be wrong choice
+        // mapControl.renderMarkers(viewModel.filterWords);
+        console.log(mapControl.markers[l]);
+        console.log(mapControl.markers);
         // Make the selected marker bounce
-        mapControl.toggleBounce(marker);
+        mapControl.toggleBounce(mapControl.markers[l]);
         
         // Then open the right infowindow
+        mapControl.infowindow.open(mapControl.map, mapControl.markers[l]); 
         
-        mapControl.infowindow.open(mapControl.map, marker); 
+        // For some weird reason I'm getting error messasges
+        // that viewModel.selectPlace is not a function (!).
+        // According to my console, it IS a function. The following
+        // two statements log teh viewModel correctly, and an 
+        // 'undefined' message, respectively.
+        // THIS DIDN'T HAPPEN until after I changed some other stuff
+        // The most recent was changin g"i" to "l" in the
+        // mapControl selectPlace function -- but maybe that's 
+        // just bceuse I as getting hung up on that issue and never
+        // seeing the next pieces.
+        console.log(viewModel);
+        console.log(viewModel());
+        
+        selectPlace(l);
         
         // Then highlight the right list item
         // STUFF
     },
     
     toggleBounce: function(marker) {
-        console.log(marker.getAnimation());
-        console.log(marker.title);
+        mapControl.markers.forEach(function(mrkr){
+            mrkr.setAnimation(null);
+        });
         if (marker.getAnimation() !== null) {
           marker.setAnimation(null);
         } else {
@@ -223,12 +268,7 @@ var mapControl = {
        
        console.log(this.bounds); // works...
        
-       console.log(filterArray);
-       console.log(viewModel);
-       console.log(viewModel.filterWords);
-       
        // First delete all existing markers.
-       
        this.markers.forEach(function(element) {
            element.setMap(null);
        });
@@ -271,10 +311,26 @@ var mapControl = {
             
             this.markers.push(marker);
             let markerTitle = marker.title;
+
             
-            // Extend the boundaries of the map for each marker and display the marker. 
-            this.bounds.extend(this.markers[i].position); // works
+            // REplace with a function where you pass an a
+            // array of relevant marekrs (the selected one or else
+            // all of them) and it extends bounds accordingly
             
+            // Extend the boundaries of the map for each marker
+            // if no marker is selected, or else the selected 
+            // marker only. 
+            
+                this.bounds.extend(marker.position); 
+            
+            /*if (viewModel.listArray[i].isSelected().title || viewModel.selected().title == markerTitle) {
+                console.log('ho yah gonna extend the bounds');
+                this.bounds.extend(marker.position); 
+            };  */
+            
+            console.log(i);
+            
+            let m = i;
             // Add an event listener to each marker for
             // being clicked.
             marker.addListener('click', function() {
@@ -282,9 +338,9 @@ var mapControl = {
                 console.log(markerTitle);
                 // First de-select all markers
                 // STUFF
-
-                mapControl.selectPlace(this); 
-
+                console.log(m); 
+                mapControl.selectPlace(m); 
+                viewModel.highlight(m);
             });
         }
         console.log(this.map); // works
@@ -305,4 +361,5 @@ var mapControl = {
 var init = function() {
     ko.applyBindings(viewModel());
     mapControl.initMap();
+    data.getFlickr();
 };
