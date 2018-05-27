@@ -1,10 +1,6 @@
-// This file was previously broken into data.js and viewModel.js, which could be done again if we can solve the asynch issue with callbacks/promises.
-
-
 var data = {
     
-    // Most likely I'll take all the selected values out of this array
-    placeData: [
+   placeData: [
         {
             title: 'Japanese Village Plaza', 
             position: {lat: 34.0488884, lng: -118.2404842},
@@ -43,11 +39,13 @@ var data = {
         }
     ],
     
-    // This function loads Flickr photos for each of the locations. 
+    selectedIndex: null,
+    
+    // This function will (once it's working) load Flickr photos for each of the locations. 
     getFlickr: function() {
         
-        var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
-            ', ' + mapControl.bounds.b.f + ', ' + mapControl.bounds.f.f;
+        var bbox = mapControl.map.bounds.b.b + ',' + mapControl.map.bounds.f.b +
+            ', ' + mapControl.map.bounds.b.f + ', ' + mapControl.map.bounds.f.f;
 
         for (i = 0; i < data.placeData.length; i++) {
             var placeText = data.placeData[i].title;
@@ -67,53 +65,23 @@ var viewModel = function() {
     
     console.log(self);
     
-    viewModel.filterWords = [];
-    
-    viewModel.highlight = function(k) {
-        console.log(k); // i'm stillc alling teh function with an object. need to change that i order to test
-        
-        console.log(window.listArray()[k]);
-        
-        viewModel().listArray()[k].isSelected = true;
-        
-        // Shouldn't need this
-        // viewModel.selected(this);
-        
-        // There might be a way to refactor this next bit
-        // so that when we render markers we are always
-        // passing an array of index values which will 
-        // correspond to particular markers that will 
-        // then be fit within the view.
-        // Make sure the selected place is within the 
-        // map's visible bounds
-        if (!mapControl.map.getBounds().contains(this.position)) {
-            mapControl.bounds.extend(this.position);
-            mapControl.map.panToBounds(mapControl.bounds);
-        };
-        
-        /* Shouldn't need this
-        for (i = 0; i < mapControl.markers.length; i++) {
-            console.log(listItem.title);
-            if (listItem.title === mapControl.markers[i].title) {
-                console.log(mapControl.markers[i].title);
-            }
-        }   */
-    }
-    
-    // shouldn't need this
-    // viewModel.selected = ko.observable({});
+    this.filterWords = [];
     
     // Called by each list item, by means of
     // data bindings in index.html
     self.selectPlace = function(l) {
+        data.selectedIndex = l;
+        console.log(data.selectedIndex);
+        console.log('selectplace through viewModel');
+        console.log(l);
         // We are passing the index value 
         // from the listArray. Using this 
         // l value (i), we can select
         // the correct place from the listArray
         // and the mapControl, also highlighting 
-        // the correct list item. 
-        viewModel.highlight(l);
-        mapControl.selectPlace(l);
+        // the correct list item.
+        mapControl.renderMap(filterWords);
+        mapControl.selectPlace(l); // apparently l is an object??
     };
     
     // The filter property keeps track 
@@ -129,18 +97,20 @@ var viewModel = function() {
     
     this.listArray().forEach(function(item) {
         
-        // To begin with, no item is selected.
-        item.isSelected = false;
+        // Compute whether each item is selected
+        // based on whether the selectedIndex is the 
+        // correct index.
+        item.isSelected = ko.computed(function() {
+            return (item == listArray()[data.selectedIndex]); 
+        });
         
-        
-
         // Determine whether each item should be filtered in
         // (i.e. displayed in the list) by using a ko.computed 
         // observable.
         item.filteredIn = ko.computed(function() {
             // Break the text input into an array of separate 
             // words, case insensitive.
-            viewModel.filterWords = filter().toLowerCase().split(' ');
+            filterWords = filter().toLowerCase().split(' ');
             
             // Put all the item together in case insensitive fashion.
             var itemInfo = (item.title + ' ' + item.feature).toLowerCase();
@@ -163,14 +133,14 @@ var viewModel = function() {
             // zero if any of the words doesn't appear.
             
             var value = 1;
-            for (i = 0; i < viewModel.filterWords.length; i++) {
-                value *= (itemInfo.indexOf(viewModel.filterWords[i]) + 1);
+            for (i = 0; i < filterWords.length; i++) {
+                value *= (itemInfo.indexOf(filterWords[i]) + 1);
             };
             return value;
         });   
 
     window.addEventListener('input', function(event) {
-        mapControl.renderMarkers(viewModel.filterWords);
+        mapControl.renderMap(filterWords);
     });
     });
 };
@@ -208,70 +178,90 @@ var mapControl = {
         });
 
         // Create markers appearing on initialize
+        for (place = 0; place < data.placeData.length; place++) {
+            var marker = new google.maps.Marker({
+                position: data.placeData[place].position,
+                map: this.map,
+                title: data.placeData[place].title,
+                feature: data.placeData[place].feature,
+                icon: this.markerImage,
+                animation: null,
+            });
+            this.markers.push(marker);
+            let thePlace = place;
+            marker.addListener('click', function() {
+                // De-select an already selected marker.
+                // This is not working for some reason.
+                console.log(data.selectedIndex + " " + thePlace);
+                if (data.selectedIndex == thePlace) {
+                    data.selectedIndex = null;
+                    console.log(data.selectedIndex);
+                } else {
+                    data.selectedIndex = thePlace;   
+                }
+                mapControl.renderMap(filterWords); 
+                // Shouldn't need this now that we're using the data.selectedIndex to set what's highlighted    highlight(thePlace);
+            });
+        };
 
-        this.renderMarkers([]);
+        // Render map feeding it an empty array
+        // to reperesent the empty search filter
+        // on load
+        this.renderMap([]);
 
     },
 
     selectPlace: function(l) {
         
+        // We shouldn't need this function now that we're going t ohandle it through the renderMAp function and the data object 
+        
         console.log(l);
         
         // First remove any other selection
-        // that might be in play.        
-        mapControl.infowindow.close();
+        // that might be in play.     
+        // NOTE here we actually need to both
+        // close the infowindow and stop the bouncing
+        // -- those two things should always happen 
+        // together.
+        // However, this feels spaghettish, like it should
+        // be separate, maybe based on a selected value 
+        // in the data model and the renderMarkers function
+        // mapControl.infowindow.close();
         
         // Why would we need to render the markers at this moment?
         // Then update which place is selected and re-render markers
         // viewModel.selected(this); // "this" might be wrong choice
         // mapControl.renderMarkers(viewModel.filterWords);
-        console.log(mapControl.markers[l]);
-        console.log(mapControl.markers);
+        
         // Make the selected marker bounce
-        mapControl.toggleBounce(mapControl.markers[l]);
+        // mapControl.toggleBounce(mapControl.markers[l]);
         
         // Then open the right infowindow
-        mapControl.infowindow.open(mapControl.map, mapControl.markers[l]); 
+        // mapControl.infowindow.open(mapControl.map, mapControl.markers[l]); 
         
-        // For some weird reason I'm getting error messasges
-        // that viewModel.selectPlace is not a function (!).
-        // According to my console, it IS a function. The following
-        // two statements log teh viewModel correctly, and an 
-        // 'undefined' message, respectively.
-        // THIS DIDN'T HAPPEN until after I changed some other stuff
-        // The most recent was changin g"i" to "l" in the
-        // mapControl selectPlace function -- but maybe that's 
-        // just bceuse I as getting hung up on that issue and never
-        // seeing the next pieces.
-        console.log(viewModel);
-        console.log(viewModel());
-        
-        selectPlace(l);
+        // Is this next line the cause of the infinite loop?selectPlace(l);
         
         // Then highlight the right list item
         // STUFF
     },
     
-    toggleBounce: function(marker) {
+    /*toggleBounce: function(marker) {
+        console.log(marker);
         mapControl.markers.forEach(function(mrkr){
             mrkr.setAnimation(null);
         });
-        if (marker.getAnimation() !== null) {
-          marker.setAnimation(null);
-        } else {
-          marker.setAnimation(google.maps.Animation.BOUNCE);
-        }
+        marker.setAnimation(google.maps.Animation.BOUNCE);
         console.log(marker.getAnimation());
-      },
+      },*/
         
-   renderMarkers: function(filterArray) {
+   renderMap: function(filterArray) {
        
        console.log(this.bounds); // works...
        
        // First delete all existing markers.
-       this.markers.forEach(function(element) {
-           element.setMap(null);
-       });
+       // this.markers.forEach(function(element) {
+        //   element.setMap(null);
+       //});
        
         // NOTE: Does the fact that this function is called
         // from an event Listener set up within the viewModel break
@@ -280,22 +270,10 @@ var mapControl = {
         // the viewModel, maybe on the whole window to listen for a 
         // keystroke.
             
-        for (i = 0; i < data.placeData.length; i++) {
-            console.log(data.placeData.length);
-            console.log(data.placeData[i]);
-            var marker = new google.maps.Marker({
-                position: data.placeData[i].position,
-                map: this.map,
-                title: data.placeData[i].title,
-                feature: data.placeData[i].feature,
-                icon: this.markerImage,
-                animation: null,
-            });
-                         
-            // Using the filterWords/filterArray value 
-            // passed to the function, render only the markers
-            // we want. 
-
+        for (i = 0; i < mapControl.markers.length; i++) {
+    
+            let marker = mapControl.markers[i];
+            
             // We'll use a similar technique to filter the markers
             // as we use to filter the list in the viewModel.
             var markerInfo = (marker.title + ' ' + 
@@ -309,52 +287,38 @@ var mapControl = {
             // is true, then add it to the markers array.
             marker.setVisible(Boolean(value));
             
-            this.markers.push(marker);
+            console.log(marker + ' and ' + value);
+    
             let markerTitle = marker.title;
-
-            
-            // REplace with a function where you pass an a
-            // array of relevant marekrs (the selected one or else
-            // all of them) and it extends bounds accordingly
             
             // Extend the boundaries of the map for each marker
             // if no marker is selected, or else the selected 
             // marker only. 
+
+            if (data.selectedIndex == null || data.selectedIndex == i) {
+                mapControl.bounds.extend(marker.position); 
+                mapControl.map.panToBounds(mapControl.bounds);
+            };
+
+            if (data.selectedIndex == i) {
+                // We don't want the marker to be selected if
+                // it's not filtered in.
+                if (!value) {
+                    data.selectedIndex = null;
+                    return;
+                };
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+                console.log(mapControl.infowindow);
+                mapControl.infowindow.open(this.map, marker); // A nearly identical statement to this was working before I refactored. Not sure what's wrong.
+            };
             
-                this.bounds.extend(marker.position); 
+            if (data.selectedIndex == null || data.selectedIndex !== i ) {
+                marker.setAnimation(null);               
+            }
             
-            /*if (viewModel.listArray[i].isSelected().title || viewModel.selected().title == markerTitle) {
-                console.log('ho yah gonna extend the bounds');
-                this.bounds.extend(marker.position); 
-            };  */
-            
-            console.log(i);
-            
-            let m = i;
-            // Add an event listener to each marker for
-            // being clicked.
-            marker.addListener('click', function() {
-                console.log(this);
-                console.log(markerTitle);
-                // First de-select all markers
-                // STUFF
-                console.log(m); 
-                mapControl.selectPlace(m); 
-                viewModel.highlight(m);
-            });
         }
-        console.log(this.map); // works
-        this.map.fitBounds(this.bounds);
+        this.map.fitBounds(mapControl.bounds);
     },
-      
-    // I might not need the below function depending
-    // on how other stuff shakes down
-    updatePlaces: function() {
-        // loop through both the markers 
-        // and the list and display only 
-        // the one(s) matching the filter
-        // which should be recorded in data
-    }
 
 };
 
