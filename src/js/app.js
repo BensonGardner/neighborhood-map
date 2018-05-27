@@ -191,7 +191,9 @@ var mapControl = {
             let thePlace = place;
             marker.addListener('click', function() {
                 // De-select an already selected marker.
-                // This is not working for some reason.
+                // This is working strangely.
+                // If you click repeatedly on the same 
+                // marker, the behavior changes.
                 console.log(data.selectedIndex + " " + thePlace);
                 if (data.selectedIndex == thePlace) {
                     data.selectedIndex = null;
@@ -200,6 +202,7 @@ var mapControl = {
                     data.selectedIndex = thePlace;   
                 }
                 mapControl.renderMap(filterWords); 
+                
                 // Shouldn't need this now that we're using the data.selectedIndex to set what's highlighted    highlight(thePlace);
             });
         };
@@ -213,24 +216,12 @@ var mapControl = {
 
     selectPlace: function(l) {
         
-        // We shouldn't need this function now that we're going t ohandle it through the renderMAp function and the data object 
+        // This was my old function that I think I shouldn't need now that I'm handling it through the renderMAp function and the data object 
         
         console.log(l);
         
-        // First remove any other selection
-        // that might be in play.     
-        // NOTE here we actually need to both
-        // close the infowindow and stop the bouncing
-        // -- those two things should always happen 
-        // together.
-        // However, this feels spaghettish, like it should
-        // be separate, maybe based on a selected value 
-        // in the data model and the renderMarkers function
         // mapControl.infowindow.close();
         
-        // Why would we need to render the markers at this moment?
-        // Then update which place is selected and re-render markers
-        // viewModel.selected(this); // "this" might be wrong choice
         // mapControl.renderMarkers(viewModel.filterWords);
         
         // Make the selected marker bounce
@@ -245,14 +236,17 @@ var mapControl = {
         // STUFF
     },
     
-    /*toggleBounce: function(marker) {
-        console.log(marker);
+    /*This was my old function which I'm trying to avoid
+    with a refactor now
+    
+    toggleBounce: function(marker) {
         mapControl.markers.forEach(function(mrkr){
             mrkr.setAnimation(null);
         });
         marker.setAnimation(google.maps.Animation.BOUNCE);
-        console.log(marker.getAnimation());
-      },*/
+      },
+      
+      */
         
    renderMap: function(filterArray) {
        
@@ -295,6 +289,10 @@ var mapControl = {
             // if no marker is selected, or else the selected 
             // marker only. 
 
+            if(data.selectedIndex == null) {
+                mapControl.infowindow.close();
+            }
+            
             if (data.selectedIndex == null || data.selectedIndex == i) {
                 mapControl.bounds.extend(marker.position); 
                 mapControl.map.panToBounds(mapControl.bounds);
@@ -309,7 +307,7 @@ var mapControl = {
                 };
                 marker.setAnimation(google.maps.Animation.BOUNCE);
                 console.log(mapControl.infowindow);
-                mapControl.infowindow.open(this.map, marker); // A nearly identical statement to this was working before I refactored. Not sure what's wrong.
+                mapControl.infowindow.open(this.map, marker); 
             };
             
             if (data.selectedIndex == null || data.selectedIndex !== i ) {
