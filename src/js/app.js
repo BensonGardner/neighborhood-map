@@ -41,15 +41,17 @@ var data = {
     
     selectedIndex: null,
     
-    // This function will (once it's working) load Flickr photos for each of the locations. 
+    // This function loads Flickr photos for each of the locations. 
     getFlickr: function() {
         
-        var bbox = mapControl.map.bounds.b.b + ',' + mapControl.map.bounds.f.b +
-            ', ' + mapControl.map.bounds.b.f + ', ' + mapControl.map.bounds.f.f;
+        var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
+            ',' + mapControl.bounds.b.f + ',' + mapControl.bounds.f.f;
 
         for (i = 0; i < data.placeData.length; i++) {
             var placeText = data.placeData[i].title;
-            var flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&text=' + placeText + '&bbox=' + bbox;    
+            var flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&text=' 
+            + encodeURI(placeText) 
+            + '&bbox=' + bbox;    
             data.placeData[i].flickr = $.getJSON(flickrURL)
                 .fail(function(){
                     data.placeData.flickr = {title: 'Unable to load photos.'};
