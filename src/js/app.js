@@ -54,8 +54,16 @@ var data = {
             + '&bbox=' + bbox;    
             data.placeData[i].flickr = $.getJSON(flickrURL)
                 .fail(function(){
-                    data.placeData.flickr = {title: 'Unable to load photos.'};
-                });
+                    data.placeData.flickr[i] = {title: 'Unable to load photos.'};
+                })
+                .done(function( data ) {
+                    $.each( data.items, function( i, item ) {
+                        $( "<img>" ).attr( "src", item.media.m ).appendTo( "#photos" );
+                        if ( i === 3 ) {
+                          return false;
+                        }
+                    });
+    });;
         };
     
     }
@@ -71,9 +79,9 @@ var viewModel = function() {
     
     // Called by each list item, by means of
     // data bindings in index.html
-    self.selectPlace = function(listItem, l) {
+    self.selectPlace = function(l, info, event) {
         data.selectedIndex = l;
-        console.log(listItem+ " " + l);
+        console.log(l + " " + info + " " + event);
         console.log(data.selectedIndex);
         listArray().forEach(function(item) {
             console.log(item.isSelected());
@@ -186,7 +194,7 @@ var mapControl = {
         // Create an infowindow object, which shall
         // remain empty until a marker is clicked.
         this.infowindow = new google.maps.InfoWindow({
-            content: ''
+            content: '<h2>Unable to load photos at this time.</h2>'
         });
 
         // Create markers appearing on initialize
@@ -321,6 +329,7 @@ var mapControl = {
                 };
                 marker.setAnimation(google.maps.Animation.BOUNCE);
                 console.log(mapControl.infowindow);
+                mapControl.infowindow.setContent('<h2>Recent photos from Flickr</h2><div id="photos">' + /*photos*/ + '</div>');
                 mapControl.infowindow.open(this.map, marker); 
             };
             
