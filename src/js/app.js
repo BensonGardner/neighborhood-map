@@ -71,9 +71,9 @@ var viewModel = function() {
     
     // Called by each list item, by means of
     // data bindings in index.html
-    self.selectPlace = function(l) {
+    self.selectPlace = function(listItem, l) {
         data.selectedIndex = l;
-        console.log(l);
+        console.log(listItem+ " " + l);
         console.log(data.selectedIndex);
         listArray().forEach(function(item) {
             console.log(item.isSelected());
@@ -291,7 +291,9 @@ var mapControl = {
             
             // Set the marker to be visible only if the value
             // is true, then add it to the markers array.
-            marker.setVisible(Boolean(value));
+            if (marker.getVisible == true) {
+                marker.setVisible(Boolean(value));
+            };
             
             console.log(marker + ' and ' + value);
     
