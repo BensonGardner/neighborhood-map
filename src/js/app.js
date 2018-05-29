@@ -71,9 +71,13 @@ var viewModel = function() {
     // data bindings in index.html
     self.selectPlace = function(l) {
         data.selectedIndex = l;
-        console.log(data.selectedIndex);
-        console.log('selectplace through viewModel');
         console.log(l);
+        console.log(data.selectedIndex);
+        listArray().forEach(function(item) {
+            console.log(item.isSelected());
+        });
+        console.log('selectplace through viewModel');
+        console.log(l); // The binding is passing an object not the index value
         // We are passing the index value 
         // from the listArray. Using this 
         // l value (i), we can select
@@ -97,13 +101,19 @@ var viewModel = function() {
     
     this.listArray().forEach(function(item) {
         
+        // It's sending the wrong value to this function??
+        
         // Compute whether each item is selected
         // based on whether the selectedIndex is the 
         // correct index.
         item.isSelected = ko.computed(function() {
-            return (item == listArray()[data.selectedIndex]); 
+            console.log(item.title + " " + 
+                        listArray.indexOf(item));
+            
+            return (listArray.indexOf(item) == listArray()[data.selectedIndex]); 
         });
         
+        console.log(item.isSelected());
         // Determine whether each item should be filtered in
         // (i.e. displayed in the list) by using a ko.computed 
         // observable.
@@ -200,7 +210,7 @@ var mapControl = {
                     console.log(data.selectedIndex);
                 } else {
                     data.selectedIndex = thePlace;   
-                }
+                };
                 mapControl.renderMap(filterWords); 
                 
                 // Shouldn't need this now that we're using the data.selectedIndex to set what's highlighted    highlight(thePlace);
