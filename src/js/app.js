@@ -44,26 +44,27 @@ var data = {
     // This function loads Flickr photos for each of the locations. 
     getFlickr: function() {
         
+        console.log("getFlickr");
+        
         var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
             ',' + mapControl.bounds.b.f + ',' + mapControl.bounds.f.f;
 
-        for (i = 0; i < data.placeData.length; i++) {
-            var placeText = data.placeData[i].title;
-            var flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&text=' 
+        var flickrURL,
+            placeText;
+        
+        for (let i = 0; i < data.placeData.length; i++) {
+            placeText = data.placeData[i].title;
+            flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&text=' 
             + encodeURI(placeText) 
-            + '&bbox=' + bbox;    
-            data.placeData[i].flickr = $.getJSON(flickrURL)
-                .fail(function(){
-                    data.placeData.flickr[i] = {title: 'Unable to load photos.'};
-                })
-                .done(function( data ) {
-                    $.each( data.items, function( i, item ) {
-                        $( "<img>" ).attr( "src", item.media.m ).appendTo( "#photos" );
-                        if ( i === 3 ) {
-                          return false;
-                        }
-                    });
-    });;
+            + '&bbox=' + bbox;  
+            console.log(flickrURL);
+            data.placeData[i].flickr = $.ajax(flickrURL, {}, function(responseData){
+                responseData.responseText.forEach(function(photo) {
+                    data.placeData.photoId[i] = id; // or shuould i do photo.media.m to store the whole file
+                });
+            }).fail(function(){
+                data.placeData[i].flickr = {title: 'Unable to load photos.'};
+            });
         };
     
     }
