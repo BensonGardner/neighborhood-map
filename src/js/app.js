@@ -81,8 +81,9 @@ var viewModel = function() {
     // Called by each list item, by means of
     // data bindings in index.html
     self.selectPlace = function(info, event, l) {
-        data.selectedIndex = l;
-        console.log(l + " " + info + " " + event);
+        selectedPlace = l();
+        data.selectedIndex = l();
+        console.log(l() + " " + info + " " + event);
         console.log(data.selectedIndex);
         listArray().forEach(function(item) {
             console.log(item.isSelected());
@@ -95,8 +96,7 @@ var viewModel = function() {
         // the correct place from the listArray
         // and the mapControl, also highlighting 
         // the correct list item.
-        mapControl.renderMap(filterWords);
-        mapControl.selectPlace(l); // apparently l is an object??
+        mapControl.renderMap(filterWords); 
     };
     
     // The filter property keeps track 
@@ -118,9 +118,8 @@ var viewModel = function() {
         // based on whether the selectedIndex is the 
         // correct index.
         item.isSelected = ko.computed(function() {
-            console.log(item.title + " " + 
-                        listArray.indexOf(item));
-            
+            console.log($index());
+            console.log(item.title + " ");
             console.log(listArray.indexOf(item) == listArray()[data.selectedIndex]);
             return (listArray.indexOf(item) == listArray()[data.selectedIndex]); 
         });
@@ -236,30 +235,6 @@ var mapControl = {
 
     },
 
-    selectPlace: function(l) {
-        
-        // This was my old function that I think I shouldn't need now that I'm handling it through the renderMAp function and the data object 
-        
-        console.log(l);
-        
-        console.log(l.isSelected);
-        
-        // mapControl.infowindow.close();
-        
-        // mapControl.renderMarkers(viewModel.filterWords);
-        
-        // Make the selected marker bounce
-        // mapControl.toggleBounce(mapControl.markers[l]);
-        
-        // Then open the right infowindow
-        // mapControl.infowindow.open(mapControl.map, mapControl.markers[l]); 
-        
-        // Is this next line the cause of the infinite loop?selectPlace(l);
-        
-        // Then highlight the right list item
-        // STUFF
-    },
-        
    renderMap: function(filterArray) {
        
        console.log(this.bounds); // works...
@@ -294,8 +269,6 @@ var mapControl = {
             if (marker.getVisible == true) {
                 marker.setVisible(Boolean(value));
             };
-            
-            console.log(marker + ' and ' + value);
     
             let markerTitle = marker.title;
             
