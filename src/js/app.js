@@ -39,8 +39,6 @@ var data = {
         }
     ],
     
-    selectedIndex: null,
-    
     // This function loads Flickr photos for each of the locations. 
     getFlickr: function() {
         
@@ -83,9 +81,7 @@ var viewModel = function() {
     // Called by each list item, by means of
     // data bindings in index.html
     self.selectPlace = function(info, event, l) {
-        selectedPlace = l();
         selectedInd(l());
-        data.selectedIndex = l();
         listArray().forEach(function(item) {
             console.log(item.isSelected());
         });
@@ -111,7 +107,7 @@ var viewModel = function() {
     
     this.listArray().forEach(function(item) {
         // Compute whether each item is selected
-        // based on whether the selectedIndex is the 
+        // based on whether the selected Index is the 
         // correct index.
         item.isSelected = ko.computed(function() {
             return (listArray.indexOf(item) == selectedInd()); 
@@ -203,17 +199,14 @@ var mapControl = {
             });
             this.markers.push(marker);
             let thePlace = place;
-            marker.addListener('click', function() {
-                // De-select an already selected marker.
-                // This is working strangely.
-                // If you click repeatedly on the same 
-                // marker, the behavior changes.
-                console.log(data.selectedIndex + " " + thePlace);
-                if (data.selectedIndex == thePlace) {
-                    data.selectedIndex = null;
-                    console.log(data.selectedIndex);
+            marker.addListener('click', function() {            
+                if (selectedInd() == thePlace) {
+                    // De-select the clicked marker if it was 
+                    // already in selected state.
+                    selectedInd(null);
                 } else {
-                    data.selectedIndex = thePlace;   
+                    // Otherwise, select the clicked marker.
+                    selectedInd(thePlace);   
                 };
                 mapControl.renderMap(filterWords); 
             });
@@ -262,20 +255,20 @@ var mapControl = {
             // if no marker is selected, or else the selected 
             // marker only. 
 
-            if(data.selectedIndex == null) {
+            if(selectedInd() == null) {
                 mapControl.infowindow.close();
             }
             
-            if (data.selectedIndex == null || data.selectedIndex == i) {
+            if (selectedInd() == null || selectedInd() == i) {
                 mapControl.bounds.extend(marker.position); 
                 mapControl.map.panToBounds(mapControl.bounds);
             };
 
-            if (data.selectedIndex == i) {
+            if (selectedInd() == i) {
                 // We don't want the marker to be selected if
                 // it's not filtered in.
                 if (!value) {
-                    data.selectedIndex = null;
+                    selectedInd(null);
                     return;
                 };
                 marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -284,7 +277,7 @@ var mapControl = {
                 mapControl.infowindow.open(this.map, marker); 
             };
             
-            if (data.selectedIndex == null || data.selectedIndex !== i ) {
+            if (selectedInd() == null || selectedInd() !== i ) {
                 marker.setAnimation(null);               
             }
             
