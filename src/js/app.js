@@ -78,18 +78,17 @@ var viewModel = function() {
     
     this.filterWords = [];
     
+    self.selectedInd = ko.observable(null);
+    
     // Called by each list item, by means of
     // data bindings in index.html
     self.selectPlace = function(info, event, l) {
         selectedPlace = l();
+        selectedInd(l());
         data.selectedIndex = l();
-        console.log(l() + " " + info + " " + event);
-        console.log(data.selectedIndex);
         listArray().forEach(function(item) {
             console.log(item.isSelected());
         });
-        console.log('selectplace through viewModel');
-        console.log(l); // The binding is passing an object not the index value
         // We are passing the index value 
         // from the listArray. Using this 
         // l value (i), we can select
@@ -111,17 +110,11 @@ var viewModel = function() {
     this.listArray = ko.observableArray(JSON.parse(JSON.stringify(data.placeData))); 
     
     this.listArray().forEach(function(item) {
-        
-        // It's sending the wrong value to this function??
-        
         // Compute whether each item is selected
         // based on whether the selectedIndex is the 
         // correct index.
         item.isSelected = ko.computed(function() {
-            console.log($index());
-            console.log(item.title + " ");
-            console.log(listArray.indexOf(item) == listArray()[data.selectedIndex]);
-            return (listArray.indexOf(item) == listArray()[data.selectedIndex]); 
+            return (listArray.indexOf(item) == selectedInd()); 
         });
         
         console.log(item.isSelected());
@@ -223,8 +216,6 @@ var mapControl = {
                     data.selectedIndex = thePlace;   
                 };
                 mapControl.renderMap(filterWords); 
-                
-                // Shouldn't need this now that we're using the data.selectedIndex to set what's highlighted    highlight(thePlace);
             });
         };
 
@@ -238,11 +229,6 @@ var mapControl = {
    renderMap: function(filterArray) {
        
        console.log(this.bounds); // works...
-       
-       // First delete all existing markers.
-       // this.markers.forEach(function(element) {
-        //   element.setMap(null);
-       //});
        
         // NOTE: Does the fact that this function is called
         // from an event Listener set up within the viewModel break
