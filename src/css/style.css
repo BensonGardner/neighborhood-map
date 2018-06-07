@@ -57,8 +57,8 @@ li {
     border-color: #888;
 }
 
-li .highlighted {
-    background-color: #92B281;
+li.highlighted {
+    background-color: #729261;
 }
 
 li:last-of-type {

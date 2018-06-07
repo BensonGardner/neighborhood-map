@@ -17,7 +17,7 @@
                 <div id="select-zone">
                     <input data-bind="textInput: filter" id="filter-input" placeholder="Search">
                     <ul id="list" data-bind="foreach: listArray">
-                        <li data-bind="click: function(data, event) {selectPlace($index, data, event);}, visible: filteredIn, css: { highlighted: isSelected }"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
+                        <li data-bind="click: function(data, event) {selectPlace(data, event, $index);}, visible: filteredIn, css: { highlighted: isSelected }"><span class="title" data-bind="text: title"></span><br><span class="feature" data-bind="text: feature"></span></li>
                     </ul>
                 </div>
             </div>

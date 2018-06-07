@@ -80,7 +80,7 @@ var viewModel = function() {
     
     // Called by each list item, by means of
     // data bindings in index.html
-    self.selectPlace = function(l, info, event) {
+    self.selectPlace = function(info, event, l) {
         data.selectedIndex = l;
         console.log(l + " " + info + " " + event);
         console.log(data.selectedIndex);
@@ -121,6 +121,7 @@ var viewModel = function() {
             console.log(item.title + " " + 
                         listArray.indexOf(item));
             
+            console.log(listArray.indexOf(item) == listArray()[data.selectedIndex]);
             return (listArray.indexOf(item) == listArray()[data.selectedIndex]); 
         });
         
@@ -241,6 +242,8 @@ var mapControl = {
         
         console.log(l);
         
+        console.log(l.isSelected);
+        
         // mapControl.infowindow.close();
         
         // mapControl.renderMarkers(viewModel.filterWords);
@@ -256,18 +259,6 @@ var mapControl = {
         // Then highlight the right list item
         // STUFF
     },
-    
-    /*This was my old function which I'm trying to avoid
-    with a refactor now
-    
-    toggleBounce: function(marker) {
-        mapControl.markers.forEach(function(mrkr){
-            mrkr.setAnimation(null);
-        });
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-      },
-      
-      */
         
    renderMap: function(filterArray) {
        
