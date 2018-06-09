@@ -42,8 +42,6 @@ var data = {
     // This function loads Flickr photos for each of the locations. 
     getFlickr: function() {
         
-        console.log("getFlickr");
-        
         var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
             ',' + mapControl.bounds.b.f + ',' + mapControl.bounds.f.f;
 
@@ -56,23 +54,14 @@ var data = {
             + encodeURI(placeText) 
             + '&bbox=' + bbox;  
             console.log(flickrURL);
-            data.placeData[i].flickr = $.ajax(flickrURL, {}, function(responseData){
-                responseData.responseText.forEach(function(photo) {
-                    data.placeData.photoId[i] = id; // or shuould i do photo.media.m to store the whole file
-                });
-            }).fail(function(){
-                data.placeData[i].flickr = {title: 'Unable to load photos.'};
-            });
+            data.placeData[i].flickr = flickrURL;
         };
-    
     }
 };
 
 var viewModel = function() {
     
     var self = this;
-    
-    console.log(self);
     
     this.filterWords = [];
     
