@@ -38,25 +38,6 @@ var data = {
             
         }
     ],
-    
-    // This function loads Flickr photos for each of the locations. 
-    getFlickr: function() {
-        
-        var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
-            ',' + mapControl.bounds.b.f + ',' + mapControl.bounds.f.f;
-
-        var flickrURL,
-            placeText;
-        
-        for (let i = 0; i < data.placeData.length; i++) {
-            placeText = data.placeData[i].title;
-            flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&text=' 
-            + encodeURI(placeText) 
-            + '&bbox=' + bbox;  
-            console.log(flickrURL);
-            data.placeData[i].flickr = flickrURL;
-        };
-    }
 };
 
 var viewModel = function() {
@@ -277,7 +258,43 @@ var mapControl = {
 };
 
 var init = function() {
+    // To initiate app, first initiate the viewModel and the map.
     ko.applyBindings(viewModel());
     mapControl.initMap();
-    data.getFlickr();
+    
+    // Finally, load Flickr data for each of the locations
+    // and push an array of photos into the viewModel.
+        
+    var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
+        ',' + mapControl.bounds.b.f + ',' + mapControl.bounds.f.f;
+
+    var flickrURL,
+        placeText;
+
+    for (let i = 0; i < data.placeData.length; i++) {
+        placeText = data.placeData[i].title;
+        flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&nojsoncallback=1&text=' 
+        + encodeURI(placeText) 
+        + '&bbox=' + bbox;  
+        console.log(flickrURL);
+        data.placeData[i].flickr = flickrURL;
+        listArray()[i].photos = ko.observableArray();
+        let settings = {
+            async: true,
+            url: flickrURL,
+            error: function(jqxhr, status, exception) {
+                console.log('Exception:', exception);
+            }
+        };
+        console.log(settings);
+        $.ajax(settings).done(function(responseData){
+            console.log(responseData);
+            responseData.photos.photo.forEach(function(pic) {
+                listArray()[i].photos.push('https://farm' + pic.farm + '.staticflickr.com/' + pic.server + '/' + pic.id + '_' + pic.secret + '_m.jpg');
+            })
+        }).fail(function(){
+            listArray()[i].photos.push('Unable to load photos.');
+        });
+        console.log(listArray()[i].photos());
+    };
 };
