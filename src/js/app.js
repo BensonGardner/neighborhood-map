@@ -243,14 +243,29 @@ var mapControl = {
                 };
                 marker.setAnimation(google.maps.Animation.BOUNCE);
                 console.log(mapControl.infowindow);
-                mapControl.infowindow.setContent('<h2>Recent photos from Flickr</h2><div id="photos">' + /*photos*/ + '</div>');
+                mapControl.infowindow.setContent('<h2>Recent photos from Flickr</h2><div id="photos"></div>');
                 mapControl.infowindow.open(this.map, marker); 
             };
             
             if (selectedInd() == null || selectedInd() !== i ) {
                 marker.setAnimation(null);               
             }
-            
+    
+        }
+       
+        // Add photos from listArray in viewModel
+        // THIS IS NOT WORKING. It may be IN WRONG SPOT.
+       // selectedInd is coming in as null. 
+        if (selectedInd() !== null) {
+            console.log(selectedInd())
+            for (n = 0; n < 4; n++) {
+                console.log(selectedInd());
+                console.log(listArray()[selectedInd()]);
+                console.log(listArray()[selectedInd()].photos());
+                console.log(listArray()[selectedInd()].photos()[n]);
+                let imgsrc = listArray()[selectedInd()].photos()[n];
+                $('#photos').append('<img src="' + imgsrc + '">');
+            }
         }
         this.map.fitBounds(mapControl.bounds);
     },
