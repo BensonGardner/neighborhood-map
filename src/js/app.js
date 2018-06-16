@@ -201,13 +201,15 @@ var mapControl = {
         // keystroke.
             
         for (i = 0; i < mapControl.markers.length; i++) {
-    
+            console.log(filterArray);
             let marker = mapControl.markers[i];
+            console.log(marker.title);
             
             // We'll use a similar technique to filter the markers
             // as we use to filter the list in the viewModel.
             var markerInfo = (marker.title + ' ' + 
                               marker.feature).toLowerCase();
+            console.log(markerInfo);
             var value = 1;
             for (j = 0; j < filterArray.length; j++) {
                 value *= (markerInfo.indexOf(filterArray[j]) + 1);
@@ -264,7 +266,29 @@ var mapControl = {
                 console.log(listArray()[selectedInd()].photos());
                 console.log(listArray()[selectedInd()].photos()[n]);
                 let imgsrc = listArray()[selectedInd()].photos()[n];
-                $('#photos').append('<img src="' + imgsrc + '">');
+                // WHY DO THE FOLLOWING 3 LINES NOT WORK?
+                if (listArray()[selectedInd()].photos()[n]) {
+                    let imgsrc = listArray()[selectedInd()].photos()[n];
+                };
+                if (imgsrc) {
+                    $('#photos').append('<img src="' + imgsrc + '">');
+                };
+                // Not sure if .length should have () before it or not
+                // Also, it might actually be better to choose a size that you want the infowindow to end up at, rather than a number of photos. 
+                if (listArray()[selectedInd()].photos().length = 0) {
+                    $('#photos').append('<p>No Flickr photos right now.</p>');
+                }
+                // ABOVE IS NOT WORKING - NOT APPENDING. PLUS, ONLY 1 IMAGE IS SHOWING FOR ALL.
+                if (listArray()[selectedInd()].photos().length > 4) {
+                    // add right and left arrows
+                    // on the right arrow, put an event listener
+                    // which will pop out initial elements of 
+                    // the photos array and then stick them back on the 
+                    // end. 
+                    // on the left arrow, a listener which will 
+                    // pop out the last 4 elements of 
+                    // the array and put them back at the beginning.
+                }
             }
         }
         this.map.fitBounds(mapControl.bounds);
