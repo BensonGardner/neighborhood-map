@@ -217,9 +217,7 @@ var mapControl = {
             
             // Set the marker to be visible only if the value
             // is true, then add it to the markers array.
-            if (marker.getVisible == true) {
-                marker.setVisible(Boolean(value));
-            };
+            marker.setVisible(Boolean(value));
     
             let markerTitle = marker.title;
             
