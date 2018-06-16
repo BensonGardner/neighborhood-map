@@ -154,7 +154,7 @@ var mapControl = {
         // Create an infowindow object, which shall
         // remain empty until a marker is clicked.
         this.infowindow = new google.maps.InfoWindow({
-            content: '<h2>Unable to load photos at this time.</h2>'
+            content: '<div id="infowindow"><h2>Unable to load photos at this time.</h2></div>'
         });
 
         // Create markers appearing on initialize
@@ -243,7 +243,7 @@ var mapControl = {
                 };
                 marker.setAnimation(google.maps.Animation.BOUNCE);
                 console.log(mapControl.infowindow);
-                mapControl.infowindow.setContent('<h2>Recent photos from Flickr</h2><div id="photos"></div>');
+                mapControl.infowindow.setContent('<div id="infowindow"><h2>Recent photos from Flickr</h2><div id="photos"></div></div>');
                 mapControl.infowindow.open(this.map, marker); 
             };
             
@@ -270,12 +270,12 @@ var mapControl = {
                 };
                 if (imgsrc) {
                     $('#photos').append('<img src="' + imgsrc + '">');
-                };
-                // Not sure if .length should have () before it or not
-                // Also, it might actually be better to choose a size that you want the infowindow to end up at, rather than a number of photos. 
-                if (listArray()[selectedInd()].photos().length = 0) {
+                } else if (n==0) {
                     $('#photos').append('<p>No Flickr photos right now.</p>');
                 }
+                // Not sure if .length should have () before it or not
+                // Also, it might actually be better to choose a size that you want the infowindow to end up at, rather than a number of photos. 
+
                 // ABOVE IS NOT WORKING - NOT APPENDING. PLUS, ONLY 1 IMAGE IS SHOWING FOR ALL.
                 if (listArray()[selectedInd()].photos().length > 4) {
                     // add right and left arrows

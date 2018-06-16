@@ -40,6 +40,7 @@ h1 {
     width: 100%;
     margin: 0px;
     border-style: none;
+    padding: 10px;
 }
 
 #list {
@@ -84,14 +85,17 @@ li:last-of-type {
     width: 75%;
 }
 
+#infowindow {
+    color: #123201;    
+}
+
 h2 {
     font-size: 15px;
     font-weight: 700;
-    color: #123201;
 }
 
-.photos {
-    
+p {
+   font-size: 12px; 
 }
 
 img {
