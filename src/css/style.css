@@ -33,7 +33,8 @@ h1 {
 }
 
 #text-elements {
-    width: 25%; 
+    width: 290px;
+    flex: initial; 
 }
 
 #filter-input {
@@ -82,7 +83,7 @@ li:last-of-type {
 
 #map {
     height: 100%;
-    width: 75%;
+    flex: auto; 
 }
 
 #infowindow {
