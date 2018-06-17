@@ -151,10 +151,16 @@ var mapControl = {
             new google.maps.Size(21,34)
         );
 
-        // Create an infowindow object, which shall
-        // remain empty until a marker is clicked.
+        // Create an infowindow object, 
+        // empty until a marker is clicked.
         this.infowindow = new google.maps.InfoWindow({
             content: '<div id="infowindow"><h2>Unable to load photos at this time.</h2></div>'
+        });
+        
+        // De-select place if user closes infowindow. 
+        this.infowindow.addListener('closeclick', function() {
+            selectedInd(null);
+            mapControl.renderMap(filterWords);
         });
 
         // Create markers appearing on initialize
@@ -242,7 +248,6 @@ var mapControl = {
                     return;
                 };
                 marker.setAnimation(google.maps.Animation.BOUNCE);
-                console.log(mapControl.infowindow);
                 mapControl.infowindow.setContent('<div id="infowindow"><h2>Recent photos from Flickr</h2><div id="photos"></div></div>');
                 mapControl.infowindow.open(this.map, marker); 
             };
@@ -255,7 +260,7 @@ var mapControl = {
        
         // Add photos from listArray in viewModel
         // THIS IS NOT WORKING. It may be IN WRONG SPOT.
-       // selectedInd is coming in as null. 
+       // selectedInd is coming in afs null. 
         if (selectedInd() !== null) {
             console.log(selectedInd())
             for (n = 0; n < 4; n++) {
