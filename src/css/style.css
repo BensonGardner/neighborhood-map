@@ -87,7 +87,8 @@ li:last-of-type {
 }
 
 #infowindow {
-    color: #123201;    
+    color: #123201;  
+    min-width:  
 }
 
 h2 {
@@ -106,9 +107,14 @@ img {
 }
 
 @media only screen and (max-width: 1000px) {
+    
+    h1 {
+        font-size: 29px;
+    }
+    
     #text-elements {
         width: 100%;
-        height: 360px;
+        height: 250px;
         overflow-y: scroll;
     }
 
