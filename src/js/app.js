@@ -125,7 +125,7 @@ var viewModel = function() {
             return value;
         });       
     });
-};
+}
 
 var mapControl = {
     
@@ -198,7 +198,7 @@ var mapControl = {
 
     },
 
-   renderMap: function(filterArray) {
+    renderMap: function(filterArray) {
        
        console.log(this.bounds); // works...
        
@@ -222,7 +222,7 @@ var mapControl = {
             var value = 1;
             for (j = 0; j < filterArray.length; j++) {
                 value *= (markerInfo.indexOf(filterArray[j]) + 1);
-            }
+            };
             
             // Set the marker to be visible only if the value
             // is true, then add it to the markers array.
@@ -246,11 +246,6 @@ var mapControl = {
             if(selectedInd() == null) {
                 mapControl.infowindow.close();
                 mapControl.bounds.extend(marker.position);
-            }
-            
-            if (selectedInd() == i) {
-                mapControl.bounds.extend(marker.position);
-                mapControl.map.panToBounds(mapControl.bounds);
             };
 
             if (selectedInd() == i) {
@@ -260,23 +255,22 @@ var mapControl = {
                     selectedInd(null);
                     return;
                 };
-                // This did not help:
-                /* if (marker.getAnimation() == null) {
+                
+                if (marker.getAnimation() == null) {
                     marker.setAnimation(google.maps.Animation.BOUNCE);
-                }; */
-                marker.setAnimation(google.maps.Animation.BOUNCE);
+                }; 
+                
                 mapControl.infowindow.setContent('<div id="infowindow"><h2>Recent photos from Flickr</h2><div id="photos"></div></div>');
                 mapControl.infowindow.open(this.map, marker); 
+                mapControl.bounds.extend(marker.position);
+                mapControl.map.panToBounds(mapControl.bounds);
             };
-            
-            // this        :   
-            //       if (selectedInd() == null || selectedInd() !== null && selectedInd() !== i ) 
-            // did not help.
+
             if (selectedInd() == null || selectedInd() !== i ) {
                 marker.setAnimation(null);               
-            }
+            };
     
-        }
+        };
        
         if (selectedInd() !== null) {
             console.log(selectedInd())
@@ -289,7 +283,7 @@ var mapControl = {
                     $('#photos').append('<img src="' + imgsrc + '">');
                 } else if (n==0) {
                     $('#photos').append('<p>No Flickr photos right now.</p>');
-                }
+                };
 
                 if (listArray()[selectedInd()].photos().length > 4) {
                     // add right and left arrows
@@ -300,12 +294,12 @@ var mapControl = {
                     // on the left arrow, a listener which will 
                     // pop out the last 4 elements of 
                     // the array and put them back at the beginning.
-                }
-            }
-        }
+                };
+            };
+        };
     },
-
-};
+    
+}
 
 var init = function() {
     // To initiate app, first initiate the viewModel and the map.
@@ -348,4 +342,4 @@ var init = function() {
         });
         console.log(listArray()[i].photos());
     };
-};
+}
