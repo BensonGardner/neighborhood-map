@@ -51,10 +51,15 @@ var viewModel = function() {
     // Called by each list item, by means of
     // data bindings in index.html
     self.selectPlace = function(info, event, l) {
-        selectedInd(l());
-        listArray().forEach(function(item) {
-            console.log(item.isSelected());
-        });
+        console.log(l + " and " + l());
+        if (selectedInd() == l()) {
+            selectedInd(null);
+        } else {
+            selectedInd(l());
+            listArray().forEach(function(item) {
+                console.log(item.isSelected());
+            });
+        };
         // We are passing the index value 
         // from the listArray. Using this 
         // l value (i), we can select
@@ -62,6 +67,7 @@ var viewModel = function() {
         // and the mapControl, also highlighting 
         // the correct list item.
         mapControl.renderMap(filterWords); 
+        mapControl.map.panToBounds(mapControl.bounds);
     };
     
     // The filter property keeps track 
@@ -117,11 +123,7 @@ var viewModel = function() {
                 value *= (itemInfo.indexOf(filterWords[i]) + 1);
             };
             return value;
-        });   
-
-    window.addEventListener('input', function(event) {
-        mapControl.renderMap(filterWords);
-    });
+        });       
     });
 };
 
@@ -192,6 +194,7 @@ var mapControl = {
         // to reperesent the empty search filter
         // on load
         this.renderMap([]);
+        mapControl.map.fitBounds(mapControl.bounds);
 
     },
 
@@ -223,8 +226,17 @@ var mapControl = {
             
             // Set the marker to be visible only if the value
             // is true, then add it to the markers array.
-            marker.setVisible(Boolean(value));
-    
+            // The getVisible method is to make sure 
+            // asynch calls in the Maps API don't cancel
+            // each other out.
+            
+            console.log(marker.getVisible());
+            console.log(Boolean(value));
+            console.log(marker.getVisible() != Boolean(value));
+            if (marker.getVisible() != Boolean(value)) {
+                marker.setVisible(Boolean(value));
+            };
+                
             let markerTitle = marker.title;
             
             // Extend the boundaries of the map for each marker
@@ -233,10 +245,11 @@ var mapControl = {
 
             if(selectedInd() == null) {
                 mapControl.infowindow.close();
+                mapControl.bounds.extend(marker.position);
             }
             
-            if (selectedInd() == null || selectedInd() == i) {
-                mapControl.bounds.extend(marker.position); 
+            if (selectedInd() == i) {
+                mapControl.bounds.extend(marker.position);
                 mapControl.map.panToBounds(mapControl.bounds);
             };
 
@@ -247,29 +260,28 @@ var mapControl = {
                     selectedInd(null);
                     return;
                 };
+                // This did not help:
+                /* if (marker.getAnimation() == null) {
+                    marker.setAnimation(google.maps.Animation.BOUNCE);
+                }; */
                 marker.setAnimation(google.maps.Animation.BOUNCE);
                 mapControl.infowindow.setContent('<div id="infowindow"><h2>Recent photos from Flickr</h2><div id="photos"></div></div>');
                 mapControl.infowindow.open(this.map, marker); 
             };
             
+            // this        :   
+            //       if (selectedInd() == null || selectedInd() !== null && selectedInd() !== i ) 
+            // did not help.
             if (selectedInd() == null || selectedInd() !== i ) {
                 marker.setAnimation(null);               
             }
     
         }
        
-        // Add photos from listArray in viewModel
-        // THIS IS NOT WORKING. It may be IN WRONG SPOT.
-       // selectedInd is coming in afs null. 
         if (selectedInd() !== null) {
             console.log(selectedInd())
             for (n = 0; n < 4; n++) {
-                console.log(selectedInd());
-                console.log(listArray()[selectedInd()]);
-                console.log(listArray()[selectedInd()].photos());
-                console.log(listArray()[selectedInd()].photos()[n]);
                 let imgsrc = listArray()[selectedInd()].photos()[n];
-                // WHY DO THE FOLLOWING 3 LINES NOT WORK?
                 if (listArray()[selectedInd()].photos()[n]) {
                     let imgsrc = listArray()[selectedInd()].photos()[n];
                 };
@@ -278,10 +290,7 @@ var mapControl = {
                 } else if (n==0) {
                     $('#photos').append('<p>No Flickr photos right now.</p>');
                 }
-                // Not sure if .length should have () before it or not
-                // Also, it might actually be better to choose a size that you want the infowindow to end up at, rather than a number of photos. 
 
-                // ABOVE IS NOT WORKING - NOT APPENDING. PLUS, ONLY 1 IMAGE IS SHOWING FOR ALL.
                 if (listArray()[selectedInd()].photos().length > 4) {
                     // add right and left arrows
                     // on the right arrow, put an event listener
@@ -294,7 +303,6 @@ var mapControl = {
                 }
             }
         }
-        this.map.fitBounds(mapControl.bounds);
     },
 
 };
@@ -306,6 +314,7 @@ var init = function() {
     
     // Finally, load Flickr data for each of the locations
     // and push an array of photos into the viewModel.
+    // Width is the Flickr API default, or 
         
     var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
         ',' + mapControl.bounds.b.f + ',' + mapControl.bounds.f.f;
@@ -317,7 +326,7 @@ var init = function() {
         placeText = data.placeData[i].title;
         flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&nojsoncallback=1&text=' 
         + encodeURI(placeText) 
-        + '&bbox=' + bbox;  
+        + '&bbox=' + bbox;
         console.log(flickrURL);
         data.placeData[i].flickr = flickrURL;
         listArray()[i].photos = ko.observableArray();

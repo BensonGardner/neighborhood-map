@@ -88,7 +88,7 @@ li:last-of-type {
 
 #infowindow {
     color: #123201;  
-    min-width:  
+    flex: 3;
 }
 
 h2 {
