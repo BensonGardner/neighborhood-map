@@ -86,13 +86,30 @@ li:last-of-type {
     flex: auto; 
 }
 
+.gm-style-iw {
+    max-width: 500px;
+}
+
 #infowindow {
     color: #123201;  
-    flex: 3;
+    margin: 0;
+}
+
+#photos {
+    flex: auto;
+    display: flex; 
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: space-around;
+}
+
+#photos img {
+    flex: 0 1 auto;
 }
 
 h2 {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
 }
 

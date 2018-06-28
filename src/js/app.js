@@ -282,7 +282,7 @@ var mapControl = {
                 if (imgsrc) {
                     $('#photos').append('<img src="' + imgsrc + '">');
                 } else if (n==0) {
-                    $('#photos').append('<p>No Flickr photos right now.</p>');
+                    $('#photos').append('<p>Unable to find Flickr photos right now.</p>');
                 };
 
                 if (listArray()[selectedInd()].photos().length > 4) {
@@ -337,8 +337,6 @@ var init = function() {
             responseData.photos.photo.forEach(function(pic) {
                 listArray()[i].photos.push('https://farm' + pic.farm + '.staticflickr.com/' + pic.server + '/' + pic.id + '_' + pic.secret + '_m.jpg');
             })
-        }).fail(function(){
-            listArray()[i].photos.push('Unable to load photos.');
         });
         console.log(listArray()[i].photos());
     };
