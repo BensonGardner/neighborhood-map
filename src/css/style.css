@@ -90,6 +90,10 @@ li:last-of-type {
     margin: 0;
 }
 
+#infowindow p {
+    width: 100%;
+}
+
 #photos {
     flex: auto;
     display: flex; 

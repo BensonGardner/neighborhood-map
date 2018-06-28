@@ -283,10 +283,12 @@ var mapControl = {
                 if (listArray()[selectedInd()].photos()[n]) {
                     let imgsrc = listArray()[selectedInd()].photos()[n];
                 };
-                if (imgsrc) {
+                if (imgsrc == 'fail') {
+                    $('#photos').append('<p>Unable to load Flickr photos right now. Please try again.</p>');
+                } else if (imgsrc) {
                     $('#photos').append('<img src="' + imgsrc + '">');
-                } else if (n==0) {
-                    $('#photos').append('<p>Unable to find Flickr photos right now.</p>');
+                } else if (n == 0) {
+                    $('#photos').append('<p>No Flickr photos available right now.</p>');
                 };
 
                 if (listArray()[selectedInd()].photos().length > 4) {
@@ -337,6 +339,11 @@ var init = function() {
         };
         console.log(settings);
         $.ajax(settings).done(function(responseData){
+            if (responseData.stat == 'fail') {
+                listArray()[i].photos.push('fail');
+                return;
+            };
+            data.flickr = 'success';
             console.log(responseData);
             responseData.photos.photo.forEach(function(pic) {
                 listArray()[i].photos.push('https://farm' + pic.farm + '.staticflickr.com/' + pic.server + '/' + pic.id + '_' + pic.secret + '_m.jpg');
