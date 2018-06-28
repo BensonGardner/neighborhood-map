@@ -76,11 +76,6 @@ li:last-of-type {
     font-size: 11px;
 }
 
-/* select-zone {
-    background-color: darkgreen;
-    width: 100%;
-}*/
-
 #map {
     height: 100%;
     flex: auto; 

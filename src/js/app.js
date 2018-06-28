@@ -125,6 +125,10 @@ var viewModel = function() {
             return value;
         });       
     });
+    
+    $(window).on('input', function() {
+        mapControl.renderMap(filterWords);
+    });
 }
 
 var mapControl = {
