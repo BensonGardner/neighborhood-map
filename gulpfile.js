@@ -9,13 +9,13 @@ var gulp = require('gulp'),
     htmlmin = require('gulp-htmlmin');
 
 gulp.task('minify', function() {
-  return gulp.src('source/**/*.html')
+  return gulp.src('src/**/*.html')
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest('dist'));
 });
  
 gulp.task('minify-css', function() {
-  return gulp.src('source/**/*.css')
+  return gulp.src('src/**/*.css')
     .pipe(cleanCSS({compatibility: 'ie8'}))
     .pipe(gulp.dest('dist'));
 });
@@ -23,7 +23,7 @@ gulp.task('minify-css', function() {
 // uglify - compress the js.
 gulp.task('compress', function (cb) {
     pump([
-        gulp.src('source/**/*.js'),
+        gulp.src('src/**/*.js'),
         uglify(),
         gulp.dest('dist')
     ],
@@ -34,13 +34,13 @@ gulp.task('compress', function (cb) {
 // image processing
 gulp.task('images', function() {
   var final = 'dist';
-  return gulp.src('source/**/*')
+  return gulp.src('src/**/*')
     .pipe(imagemin({ optimizationLevel: 7 }))
     .pipe(gulp.dest(final));
 });
 
 gulp.task('commit', function() {
-  return gulp.src('source/**')
+  return gulp.src('src/**')
     .pipe(git.add())
     .pipe(git.commit(''));
     git.push('', function (err) {

@@ -1,4 +1,4 @@
-/* Contains all styles other than those of the map, which are contained in viewModel.js. */
+/* Contains styles not on the map, as well as style for the map infowindow. Other map styles are created with mapstyles.js. */
 
 html {
     height: 100%;
@@ -15,7 +15,6 @@ body {
 }
 
 header {
-    /*background: white;*/
     height: 10wv;
     margin: 0 0 0 10px;
 }
@@ -51,9 +50,7 @@ h1 {
 }
 
 li {
-    /*height: 40px; */
     padding: 12px;
-    /* margin: 30px 0; */
     border-top-style: solid;
     border-width: 2px;
     border-color: #888;
@@ -130,7 +127,7 @@ img {
     
     #text-elements {
         width: 100%;
-        height: 250px;
+        height: 50%;
         overflow-y: scroll;
     }
 
