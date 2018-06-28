@@ -51,14 +51,10 @@ var viewModel = function() {
     // Called by each list item, by means of
     // data bindings in index.html
     self.selectPlace = function(info, event, l) {
-        console.log(l + " and " + l());
         if (selectedInd() == l()) {
             selectedInd(null);
         } else {
             selectedInd(l());
-            listArray().forEach(function(item) {
-                console.log(item.isSelected());
-            });
         };
         // We are passing the index value 
         // from the listArray. Using this 
@@ -89,7 +85,6 @@ var viewModel = function() {
             return (listArray.indexOf(item) == selectedInd()); 
         });
         
-        console.log(item.isSelected());
         // Determine whether each item should be filtered in
         // (i.e. displayed in the list) by using a ko.computed 
         // observable.
@@ -204,8 +199,6 @@ var mapControl = {
 
     renderMap: function(filterArray) {
        
-       console.log(this.bounds); // works...
-       
         // NOTE: Does the fact that this function is called
         // from an event Listener set up within the viewModel break
         // the rule of not having Knockout handle the Maps API?
@@ -214,15 +207,12 @@ var mapControl = {
         // keystroke.
             
         for (i = 0; i < mapControl.markers.length; i++) {
-            console.log(filterArray);
             let marker = mapControl.markers[i];
-            console.log(marker.title);
             
             // We'll use a similar technique to filter the markers
             // as we use to filter the list in the viewModel.
             var markerInfo = (marker.title + ' ' + 
                               marker.feature).toLowerCase();
-            console.log(markerInfo);
             var value = 1;
             for (j = 0; j < filterArray.length; j++) {
                 value *= (markerInfo.indexOf(filterArray[j]) + 1);
@@ -233,10 +223,7 @@ var mapControl = {
             // The getVisible method is to make sure 
             // asynch calls in the Maps API don't cancel
             // each other out.
-            
-            console.log(marker.getVisible());
-            console.log(Boolean(value));
-            console.log(marker.getVisible() != Boolean(value));
+
             if (marker.getVisible() != Boolean(value)) {
                 marker.setVisible(Boolean(value));
             };
@@ -277,7 +264,6 @@ var mapControl = {
         };
        
         if (selectedInd() !== null) {
-            console.log(selectedInd())
             for (n = 0; n < 4; n++) {
                 let imgsrc = listArray()[selectedInd()].photos()[n];
                 if (listArray()[selectedInd()].photos()[n]) {
@@ -289,17 +275,6 @@ var mapControl = {
                     $('#photos').append('<img src="' + imgsrc + '">');
                 } else if (n == 0) {
                     $('#photos').append('<p>No Flickr photos available right now.</p>');
-                };
-
-                if (listArray()[selectedInd()].photos().length > 4) {
-                    // add right and left arrows
-                    // on the right arrow, put an event listener
-                    // which will pop out initial elements of 
-                    // the photos array and then stick them back on the 
-                    // end. 
-                    // on the left arrow, a listener which will 
-                    // pop out the last 4 elements of 
-                    // the array and put them back at the beginning.
                 };
             };
         };
@@ -313,8 +288,9 @@ var init = function() {
     mapControl.initMap();
     
     // Finally, load Flickr data for each of the locations
-    // and push an array of photos into the viewModel.
-    // Width is the Flickr API default, or 
+    // and push an array of photos into the viewModel. 
+    // Width is at Flickr's default, as it's close to what
+    // we need.
         
     var bbox = mapControl.bounds.b.b + ',' + mapControl.bounds.f.b +
         ',' + mapControl.bounds.b.f + ',' + mapControl.bounds.f.f;
@@ -327,7 +303,6 @@ var init = function() {
         flickrURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ef3f7d59d4fd1ccbc829daa5d04ac6a7&format=json&nojsoncallback=1&text=' 
         + encodeURI(placeText) 
         + '&bbox=' + bbox;
-        console.log(flickrURL);
         data.placeData[i].flickr = flickrURL;
         listArray()[i].photos = ko.observableArray();
         let settings = {
@@ -337,18 +312,23 @@ var init = function() {
                 console.log('Exception:', exception);
             }
         };
-        console.log(settings);
+
+        /* If there is a problem with the load, we'll 
+           record that in the viewModel's listArray...
+           so that we can give users an error message 
+           that informs them of what the issue is. 
+           Otherwise, we'll push the photos into the array.
+           If Flickr has no matching photos right now,
+           we'll let users know that as well. */
+        
         $.ajax(settings).done(function(responseData){
             if (responseData.stat == 'fail') {
                 listArray()[i].photos.push('fail');
                 return;
             };
-            data.flickr = 'success';
-            console.log(responseData);
             responseData.photos.photo.forEach(function(pic) {
                 listArray()[i].photos.push('https://farm' + pic.farm + '.staticflickr.com/' + pic.server + '/' + pic.id + '_' + pic.secret + '_m.jpg');
             })
         });
-        console.log(listArray()[i].photos());
     };
 }
