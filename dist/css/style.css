@@ -1,0 +1,137 @@
+/* Contains styles not on the map, as well as style for the map infowindow. Other map styles are created with mapstyles.js. */
+
+html {
+    height: 100%;
+}
+
+body {
+    background-color: #123201;
+    font-family: Roboto, sans-serif;
+    color: #F9F9F9;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+header {
+    height: 10wv;
+    margin: 0 0 0 10px;
+}
+
+h1 {
+    font-size: 39px;
+    font-weight: 700;
+}
+
+#container {
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap-reverse;
+}
+
+#text-elements {
+    width: 290px;
+    flex: initial; 
+}
+
+#filter-input {
+    width: 100%;
+    margin: 0px;
+    border-style: none;
+    padding: 12px;
+}
+
+#list {
+    list-style-type: none;
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+li {
+    padding: 12px;
+    border-top-style: solid;
+    border-width: 2px;
+    border-color: #888;
+}
+
+li.highlighted {
+    background-color: #729261;
+}
+
+li:last-of-type {
+    border-bottom-style: solid;
+}
+
+.title {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.feature {
+    font-size: 11px;
+}
+
+#map {
+    height: 100%;
+    flex: auto; 
+}
+
+.gm-style-iw {
+    max-width: 500px;
+}
+
+#infowindow {
+    color: #123201;  
+    margin: 0;
+}
+
+#infowindow p {
+    width: 100%;
+}
+
+#photos {
+    flex: auto;
+    display: flex; 
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: space-around;
+}
+
+#photos img {
+    flex: 0 1 auto;
+}
+
+h2 {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+p {
+   font-size: 12px; 
+}
+
+img {
+    height: 150px;
+    float: left;
+    padding: 10px;
+}
+
+@media only screen and (max-width: 1000px) {
+    
+    h1 {
+        font-size: 29px;
+    }
+    
+    #text-elements {
+        width: 100%;
+        height: 50%;
+        overflow-y: scroll;
+    }
+
+    #map {
+        width: 100%;
+    }
+}
