@@ -124,6 +124,7 @@ var viewModel = function() {
     $(window).on('input', function() {
         mapControl.renderMap(filterWords);
     });
+    
 }
 
 var mapControl = {
@@ -283,6 +284,7 @@ var mapControl = {
 }
 
 var init = function() {
+
     // To initiate app, first initiate the viewModel and the map.
     ko.applyBindings(viewModel());
     mapControl.initMap();
@@ -331,4 +333,12 @@ var init = function() {
             })
         });
     };
-}
+};
+
+var errorMsg = function() {
+    var msg = document.createTextNode('Sorry about this, but there\'s a problem loading the map. Please try again.');
+    var node = document.createElement('p');
+    node.appendChild(msg);
+    node.className = 'warning';
+    document.getElementById('map').appendChild(node);
+};
