@@ -134,6 +134,8 @@ var mapControl = {
     markers: [],
 
     initMap: function() {
+        
+        console.log(document.getElementsByClassName('gm-err-content'));
 
         this.map = new google.maps.Map(document.getElementById('map'), {
                 // We don't need "center" or "zoom" values 
@@ -335,10 +337,17 @@ var init = function() {
     };
 };
 
-var errorMsg = function() {
+// The errorMsg function kicks in if the Google Maps API
+// doesn't load properly.
+var googleErrorMsg = function() {
     var msg = document.createTextNode('Sorry about this, but there\'s a problem loading the map. Please try again.');
-    var node = document.createElement('p');
-    node.appendChild(msg);
-    node.className = 'warning';
-    document.getElementById('map').appendChild(node);
+    /* var googleMessage = document.getElementsByClassName('gm-err-content');
+    if (googleMessage) {
+        googleMessage.first.innerHTML('<h2>' + msg + ' YEAH </h2>');
+    } else {*/
+        var node = document.createElement('p');
+        node.appendChild(msg);
+        node.className = 'warning';
+        document.getElementById('map').appendChild(node);
+    //};
 };
