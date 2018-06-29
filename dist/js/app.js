@@ -341,13 +341,8 @@ var init = function() {
 // doesn't load properly.
 var googleErrorMsg = function() {
     var msg = document.createTextNode('Sorry about this, but there\'s a problem loading the map. Please try again.');
-    /* var googleMessage = document.getElementsByClassName('gm-err-content');
-    if (googleMessage) {
-        googleMessage.first.innerHTML('<h2>' + msg + ' YEAH </h2>');
-    } else {*/
-        var node = document.createElement('p');
-        node.appendChild(msg);
-        node.className = 'warning';
-        document.getElementById('map').appendChild(node);
-    //};
+    var node = document.createElement('p');
+    node.appendChild(msg);
+    node.className = 'warning';
+    document.getElementById('map').appendChild(node);
 };
